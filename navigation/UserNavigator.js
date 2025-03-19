@@ -22,11 +22,6 @@ const UserNavigator = () => {
 
       {/* Screens that can be accessed from multiple tabs or deep links */}
       <UserStack.Screen
-        name="BookDetail"
-        component={safeScreen(BookDetailScreen, "Book Details")}
-        options={{ headerShown: true, title: "Book Details" }}
-      />
-      <UserStack.Screen
         name="Notifications"
         component={safeScreen(NotificationsScreen, "Notifications")}
         options={{ headerShown: true, title: "Notifications" }}

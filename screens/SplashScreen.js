@@ -52,7 +52,7 @@ const SplashScreen = ({ navigation }) => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={() => navigation.navigate("Login")}
+          onPress={() => navigation.navigate("Auth", { screen: "Register" })}
           style={styles.getStartedButtonContainer}
         >
           <LinearGradient

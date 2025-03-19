@@ -11,9 +11,14 @@ import AuthNavigator from "./navigation/AuthNavigator";
 import UserNavigator from "./navigation/UserNavigator";
 import StaffNavigator from "./navigation/StaffNavigator";
 import SplashScreen from "./screens/SplashScreen";
-
+import LoginScreen from "./screens/auth/LoginScreen";
 // Contexts
 import { AuthProvider, useAuth } from "./context/AuthContext";
+
+//Test component
+import BookListScreen from "./screens/user/BookListScreen";
+
+
 
 const Stack = createStackNavigator();
 
@@ -32,6 +37,10 @@ const Navigation = () => {
             <Stack.Screen
               name="Auth"
               component={AuthNavigator}
+            />
+            <Stack.Screen
+              name="User"
+              component={UserNavigator}
             />
             <Stack.Screen
               name="Staff"

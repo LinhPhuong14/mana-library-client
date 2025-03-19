@@ -13,13 +13,12 @@ const HistoryStack = createStackNavigator();
 const SettingsStack = createStackNavigator();
 
 // Use placeholders for screens that can't be resolved
-const HomeScreen = importScreen("../screens/user/HomeScreen", "Home");
-const BooksListScreen = importScreen("../screens/user/BooksListScreen", "Books List");
-const BookDetailScreen = importScreen("../screens/user/BookDetailScreen", "Book Details");
-const ProfileScreen = importScreen("../screens/user/ProfileScreen", "Profile");
-const HistoryScreen = importScreen("../screens/user/HistoryScreen", "History");
-const SettingsScreen = importScreen("../screens/user/SettingsScreen", "Settings");
-
+import HomeScreen from "../screens/user/HomeScreen";
+import BooksListScreen from "../screens/user/BookListScreen";
+import ProfileScreen from "../screens/user/ProfileScreen";
+import BookDetailScreen from "../screens/user/BookDetailScreen";
+import HistoryScreen from "../screens/user/HistoryScreen";
+import SettingsScreen from "../screens/user/SettingsScreen";
 const HomeStackScreen = () => (
   <HomeStack.Navigator>
     <HomeStack.Screen
@@ -34,12 +33,12 @@ const BooksStackScreen = () => (
   <BooksStack.Navigator>
     <BooksStack.Screen
       name="BooksList"
-      component={safeScreen(BooksListScreen, "Books List")}
+      component={BooksListScreen}
       options={{ title: "Books" }}
     />
     <BooksStack.Screen
       name="BookDetail"
-      component={safeScreen(BookDetailScreen, "Book Details")}
+      component={BookDetailScreen}
       options={{ title: "Book Details" }}
     />
   </BooksStack.Navigator>
