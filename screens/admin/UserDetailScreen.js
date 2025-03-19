@@ -116,7 +116,9 @@ const UserDetailScreen = ({ navigation, route }) => {
   };
 
   const handleManageLoans = () => {
-    Alert.alert("Manage Loans", "This would navigate to a screen to manage this user's book loans.", [{ text: "OK" }]);
+    // Alert.alert("Manage Loans", "This would navigate to a screen to manage this user's book loans.", [{ text: "OK" }]);
+    // navigate to ManageLoansScreen
+    navigation.navigate("ManageLoans", { user: formData });
   };
 
   const handleDateChange = (event, selectedDate) => {

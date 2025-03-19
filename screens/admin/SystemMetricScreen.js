@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Card } from "react-native-paper";
+import { Button, Card } from "react-native-paper";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -145,10 +145,15 @@ const SystemMetricsScreen = ({ navigation }) => {
             icon="people"
             onPress={() => navigation.navigate("ManageUsers")}
           />
-          <ActionButton
+          {/* <ActionButton
             title="Server Config"
             icon="settings"
             onPress={() => navigation.navigate("ServerConfig")}
+          /> */}
+          <ActionButton
+            title="Manage Loans"
+            icon="receipt"
+            onPress={() => navigation.navigate("ManageLoans")}
           />
         </View>
 
@@ -211,6 +216,14 @@ const SystemMetricsScreen = ({ navigation }) => {
               <Text style={styles.statusText}>64% used (3.2/5GB)</Text>
             </View>
           </Card.Content>
+          {/* Server config button */}
+          <Button
+            mode="contained"
+            style={{ margin: 16 }}
+            onPress={() => navigation.navigate("ServerConfig")}
+          >
+            Server Config
+          </Button>
         </Card>
 
         <Text style={styles.versionText}>ManaLibrary Admin v1.0.0</Text>

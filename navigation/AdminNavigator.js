@@ -9,6 +9,7 @@ import AddBookScanScreen from "../screens/admin/AddBookScanScreen";
 import ServerConfigScreen from "../screens/admin/ServerConfigScreen";
 import ManageUsersScreen from "../screens/admin/ManageUsersScreen";
 import UserDetailScreen from "../screens/admin/UserDetailScreen";
+import ManageLoansScreen from "../screens/admin/ManageLoanScreen";
 
 const AdminStack = createStackNavigator();
 
@@ -54,6 +55,11 @@ const AdminNavigator = () => {
       <AdminStack.Screen
         name="ServerConfig"
         component={ServerConfigScreen}
+        options={{ headerShown: false }}
+      />
+      <AdminStack.Screen
+        name="ManageLoans"
+        component={ManageLoansScreen}
         options={{ headerShown: false }}
       />
     </AdminStack.Navigator>
