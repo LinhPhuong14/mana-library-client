@@ -4,10 +4,10 @@ import { Card, Title, Paragraph, Button, ActivityIndicator } from "react-native-
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
-import adminService from "../../services/adminService";
 import bookService from "../../services/bookService";
-import DashboardMetricCard from "../../components/staff/DashboardMetricCard";
-import RecentActivityList from "../../components/staff/RecentActivityList";
+import DashboardMetricCard from "../../components/common/DashboardMetricCard";
+import RecentActivityList from "../../components/common/RecentActivityList";
+import { useAdmin } from "../../context/AdminContext";
 
 const DashboardScreen = () => {
   const [metrics, setMetrics] = useState(null);
@@ -16,17 +16,43 @@ const DashboardScreen = () => {
   const [error, setError] = useState(null);
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { getSystemStats } = useAdmin();
+
+  // Create placeholder metrics data
+  const placeholderMetrics = {
+    bookCount: 1245,
+    userCount: 382,
+    borrowedCount: 87,
+    overdueCount: 12,
+    recentActivities: [
+      { id: 1, type: "checkout", user: "John Doe", item: "The Great Gatsby", timestamp: new Date(Date.now() - 3600000).toISOString() },
+      { id: 2, type: "return", user: "Jane Smith", item: "To Kill a Mockingbird", timestamp: new Date(Date.now() - 7200000).toISOString() },
+      { id: 3, type: "new_user", user: "Alex Johnson", item: null, timestamp: new Date(Date.now() - 86400000).toISOString() },
+      { id: 4, type: "new_book", user: "Admin", item: "The Hobbit", timestamp: new Date(Date.now() - 172800000).toISOString() },
+      { id: 5, type: "checkout", user: "Robert Brown", item: "1984", timestamp: new Date(Date.now() - 259200000).toISOString() },
+    ],
+    stats: {
+      mostPopularBook: "Harry Potter and the Philosopher's Stone",
+      mostActiveUser: "Jane Smith",
+      checkoutsThisMonth: 124,
+      returnsThisMonth: 98,
+    },
+  };
 
   const loadDashboardData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const metricsData = await adminService.getMetrics();
-      setMetrics(metricsData);
+
+      // Instead of calling an actual service, use the placeholder data
+      setTimeout(() => {
+        setMetrics(placeholderMetrics);
+        setLoading(false);
+        setRefreshing(false);
+      }, 1000); // Simulate network delay
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
       setError("Failed to load dashboard data. Please try again.");
-    } finally {
       setLoading(false);
       setRefreshing(false);
     }
@@ -43,17 +69,16 @@ const DashboardScreen = () => {
 
   const handleExportBooks = async () => {
     try {
-      await bookService.exportBooks();
-      // Handle success - perhaps show a success message
+      // Show placeholder message instead of actual export
+      alert("This is a placeholder. Book export functionality is not implemented.");
     } catch (error) {
       console.error("Failed to export books:", error);
-      // Handle error - show error message
     }
   };
 
   const handleImportBooks = () => {
-    // Navigate to book import screen or open file picker
-    navigation.navigate("ImportBooks");
+    // Navigate to book import screen or show placeholder message
+    alert("This is a placeholder. Book import functionality is not implemented.");
   };
 
   if (loading && !refreshing) {

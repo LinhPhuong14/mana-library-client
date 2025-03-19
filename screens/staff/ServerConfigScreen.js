@@ -3,16 +3,12 @@ import { View, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform } f
 import { Text, Card, TextInput, Button, Divider, Switch, ActivityIndicator, HelperText, Snackbar, Portal, Dialog, Paragraph, IconButton, Title, List, ProgressBar } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { useAdmin } from "../../context/AdminContext";
-import adminService from "../../services/adminService";
-import ErrorDisplay from "../../components/common/ErrorDisplay";
 
 const ServerConfigScreen = () => {
   const navigation = useNavigation();
-  const { updateSystemSettings, loading: contextLoading } = useAdmin();
 
   // State variables
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
   const [error, setError] = useState(null);
@@ -21,28 +17,28 @@ const ServerConfigScreen = () => {
   const [resetDialogVisible, setResetDialogVisible] = useState(false);
   const [restartDialogVisible, setRestartDialogVisible] = useState(false);
 
-  // Server configuration state
+  // Server configuration state (placeholder values)
   const [serverConfig, setServerConfig] = useState({
     // API Configuration
-    apiUrl: "",
-    apiPort: "",
+    apiUrl: "https://api.example.com",
+    apiPort: "3000",
     apiVersion: "v1",
     apiTimeout: "30000",
 
     // Database Configuration
-    dbHost: "",
-    dbPort: "",
-    dbName: "",
-    dbUser: "",
-    dbPassword: "",
+    dbHost: "localhost",
+    dbPort: "5432",
+    dbName: "mana_db",
+    dbUser: "admin",
+    dbPassword: "********",
 
     // Email Configuration
-    smtpHost: "",
-    smtpPort: "",
-    smtpUser: "",
-    smtpPassword: "",
-    smtpFrom: "",
-    smtpSecure: false,
+    smtpHost: "smtp.example.com",
+    smtpPort: "587",
+    smtpUser: "noreply@example.com",
+    smtpPassword: "********",
+    smtpFrom: "library@example.com",
+    smtpSecure: true,
 
     // Security Configuration
     corsOrigin: "*",
@@ -56,34 +52,7 @@ const ServerConfigScreen = () => {
     debugMode: false,
   });
 
-  // Load server configuration
-  useEffect(() => {
-    loadServerConfig();
-  }, []);
-
-  // Load server configuration from API
-  const loadServerConfig = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Fetch server configuration from API
-      const config = await adminService.getSystemSettings();
-
-      // Update state with fetched configuration
-      setServerConfig({
-        ...serverConfig,
-        ...config,
-      });
-    } catch (err) {
-      console.error("Failed to load server configuration:", err);
-      setError(err.message || "Failed to load server configuration");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle input change
+  // Handle input change (only updates local state)
   const handleInputChange = (key, value) => {
     setServerConfig({
       ...serverConfig,
@@ -91,174 +60,77 @@ const ServerConfigScreen = () => {
     });
   };
 
-  // Save server configuration
-  const handleSaveConfig = async () => {
-    try {
-      setSaving(true);
-      setError(null);
+  // Placeholder function for save config
+  const handleSaveConfig = () => {
+    setSaving(true);
 
-      // Call API to update system settings
-      const result = await updateSystemSettings(serverConfig);
-
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
-      // Show success snackbar
-      setSnackbarMessage("Server configuration saved successfully");
+    // Simulate API call
+    setTimeout(() => {
+      setSnackbarMessage("This is a placeholder. Configuration saving not implemented.");
       setSnackbarVisible(true);
-    } catch (err) {
-      console.error("Failed to save server configuration:", err);
-      Alert.alert("Error", err.message || "Failed to save server configuration");
-    } finally {
       setSaving(false);
-    }
+    }, 1000);
   };
 
-  // Test server connection
-  const handleTestConnection = async () => {
-    try {
-      setTesting(true);
+  // Placeholder function for test connection
+  const handleTestConnection = () => {
+    setTesting(true);
 
-      // Call API to test connection
-      const result = await adminService.testConnection({
-        apiUrl: serverConfig.apiUrl,
-        apiPort: serverConfig.apiPort,
-      });
-
-      if (result.success) {
-        setSnackbarMessage("Connection successful! Server is responding.");
-      } else {
-        setSnackbarMessage("Connection failed. Server not responding.");
-      }
-
+    // Simulate API call
+    setTimeout(() => {
+      setSnackbarMessage("This is a placeholder. Connection testing not implemented.");
       setSnackbarVisible(true);
-    } catch (err) {
-      setSnackbarMessage("Connection test failed: " + (err.message || "Unknown error"));
-      setSnackbarVisible(true);
-    } finally {
       setTesting(false);
-    }
+    }, 1000);
   };
 
-  // Test email configuration
-  const handleTestEmail = async () => {
-    try {
-      setTesting(true);
+  // Placeholder function for test email
+  const handleTestEmail = () => {
+    setTesting(true);
 
-      // Call API to test email configuration
-      const result = await adminService.testEmail({
-        smtpHost: serverConfig.smtpHost,
-        smtpPort: serverConfig.smtpPort,
-        smtpUser: serverConfig.smtpUser,
-        smtpPassword: serverConfig.smtpPassword,
-        smtpFrom: serverConfig.smtpFrom,
-        smtpSecure: serverConfig.smtpSecure,
-      });
-
-      if (result.success) {
-        setSnackbarMessage("Email test successful! Test email sent.");
-      } else {
-        setSnackbarMessage("Email test failed. Please check SMTP settings.");
-      }
-
+    // Simulate API call
+    setTimeout(() => {
+      setSnackbarMessage("This is a placeholder. Email testing not implemented.");
       setSnackbarVisible(true);
-    } catch (err) {
-      setSnackbarMessage("Email test failed: " + (err.message || "Unknown error"));
-      setSnackbarVisible(true);
-    } finally {
       setTesting(false);
-    }
+    }, 1000);
   };
 
-  // Handle reset configuration
+  // Placeholder function for reset config
   const handleResetConfig = () => {
     setResetDialogVisible(true);
   };
 
-  // Confirm reset configuration
-  const confirmResetConfig = async () => {
-    try {
-      setResetDialogVisible(false);
-      setSaving(true);
+  // Placeholder function for confirm reset
+  const confirmResetConfig = () => {
+    setResetDialogVisible(false);
+    setSaving(true);
 
-      // Call API to reset configuration
-      const result = await adminService.resetSystemSettings();
-
-      if (result.success) {
-        // Reload configuration
-        await loadServerConfig();
-
-        setSnackbarMessage("Server configuration reset to defaults");
-        setSnackbarVisible(true);
-      } else {
-        throw new Error(result.error || "Failed to reset configuration");
-      }
-    } catch (err) {
-      console.error("Failed to reset configuration:", err);
-      Alert.alert("Error", err.message || "Failed to reset configuration");
-    } finally {
+    // Simulate API call
+    setTimeout(() => {
+      setSnackbarMessage("This is a placeholder. Configuration reset not implemented.");
+      setSnackbarVisible(true);
       setSaving(false);
-    }
+    }, 1000);
   };
 
-  // Handle restart server
+  // Placeholder function for restart server
   const handleRestartServer = () => {
     setRestartDialogVisible(true);
   };
 
-  // Confirm restart server
-  const confirmRestartServer = async () => {
-    try {
-      setRestartDialogVisible(false);
-      setSaving(true);
+  // Placeholder function for confirm restart
+  const confirmRestartServer = () => {
+    setRestartDialogVisible(false);
+    setSaving(true);
 
-      // Call API to restart server
-      const result = await adminService.restartServer();
-
-      if (result.success) {
-        setSnackbarMessage("Server restarting, please wait...");
-        setSnackbarVisible(true);
-
-        // Wait for server to restart before reloading configuration
-        setTimeout(async () => {
-          await loadServerConfig();
-          setSnackbarMessage("Server restarted successfully");
-          setSnackbarVisible(true);
-        }, 5000);
-      } else {
-        throw new Error(result.error || "Failed to restart server");
-      }
-    } catch (err) {
-      console.error("Failed to restart server:", err);
-      Alert.alert("Error", err.message || "Failed to restart server");
-    } finally {
+    // Simulate API call
+    setTimeout(() => {
+      setSnackbarMessage("This is a placeholder. Server restart not implemented.");
+      setSnackbarVisible(true);
       setSaving(false);
-    }
+    }, 1000);
   };
-
-  // Loading state
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator
-          size="large"
-          color="#4568DC"
-        />
-        <Text style={styles.loadingText}>Loading server configuration...</Text>
-      </View>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <ErrorDisplay
-        error={error}
-        onRetry={loadServerConfig}
-      />
-    );
-  }
 
   return (
     <KeyboardAvoidingView
@@ -274,7 +146,10 @@ const ServerConfigScreen = () => {
               <IconButton
                 icon="refresh"
                 size={20}
-                onPress={loadServerConfig}
+                onPress={() => {
+                  setSnackbarMessage("Refresh functionality not implemented");
+                  setSnackbarVisible(true);
+                }}
               />
             </View>
 
@@ -498,7 +373,7 @@ const ServerConfigScreen = () => {
               mode="contained"
               onPress={handleTestEmail}
               loading={testing}
-              disabled={testing || saving || !serverConfig.smtpHost}
+              disabled={testing || saving}
               style={[styles.button, { marginTop: 10 }]}
             >
               Test Email Configuration

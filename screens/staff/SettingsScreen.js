@@ -5,8 +5,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
 import { useAdmin } from "../../context/AdminContext";
-import adminService from "../../services/adminService";
-import userService from "../../services/userService";
 import ErrorDisplay from "../../components/common/ErrorDisplay";
 
 const SettingsScreen = () => {
@@ -55,9 +53,8 @@ const SettingsScreen = () => {
       },
     });
 
-    // In a real app, we'd save this to the server
-    // For now, just show a snackbar
-    setSnackbarMessage(`${setting} has been ${!settings[category][setting] ? "enabled" : "disabled"}`);
+    // Show snackbar for placeholder feedback
+    setSnackbarMessage(`${setting} has been ${!settings[category][setting] ? "enabled" : "disabled"} (placeholder)`);
     setSnackbarVisible(true);
   };
 
@@ -68,14 +65,12 @@ const SettingsScreen = () => {
 
   // Handle password change
   const handleChangePassword = () => {
-    // In a real app, navigate to password change screen
-    Alert.alert("Change Password", "This feature would navigate to a password change screen");
+    Alert.alert("Change Password", "This is a placeholder. Password change functionality is not implemented.");
   };
 
   // Handle profile edit
   const handleEditProfile = () => {
-    // In a real app, navigate to profile edit screen
-    Alert.alert("Edit Profile", "This feature would navigate to a profile edit screen");
+    Alert.alert("Edit Profile", "This is a placeholder. Profile editing functionality is not implemented.");
   };
 
   // Handle backup data
@@ -87,10 +82,10 @@ const SettingsScreen = () => {
       // Mock backup operation
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      setSnackbarMessage("System data backup completed successfully");
+      setSnackbarMessage("This is a placeholder. Backup functionality is not implemented.");
       setSnackbarVisible(true);
     } catch (err) {
-      setError(err.message || "Failed to backup data");
+      setError("This is a placeholder. An error occurred during the simulated backup.");
     } finally {
       setLoading(false);
     }
@@ -105,10 +100,10 @@ const SettingsScreen = () => {
       // Mock export operation
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      setSnackbarMessage("Data exported successfully");
+      setSnackbarMessage("This is a placeholder. Export functionality is not implemented.");
       setSnackbarVisible(true);
     } catch (err) {
-      setError(err.message || "Failed to export data");
+      setError("This is a placeholder. An error occurred during the simulated export.");
     } finally {
       setLoading(false);
     }
@@ -127,8 +122,7 @@ const SettingsScreen = () => {
 
   // Handle view activity logs
   const handleViewLogs = () => {
-    // In a real app, navigate to activity logs screen
-    Alert.alert("Activity Logs", "This feature would navigate to an activity logs screen");
+    Alert.alert("Activity Logs", "This is a placeholder. Activity logs functionality is not implemented.");
   };
 
   return (
@@ -195,7 +189,10 @@ const SettingsScreen = () => {
                   icon="chevron-right"
                 />
               )}
-              onPress={() => {}}
+              onPress={() => {
+                setSnackbarMessage("This is a placeholder. Email preferences functionality is not implemented.");
+                setSnackbarVisible(true);
+              }}
             />
             <Divider />
             <List.Item
@@ -208,7 +205,10 @@ const SettingsScreen = () => {
                 />
               )}
               right={(props) => <Switch value={false} />}
-              onPress={() => {}}
+              onPress={() => {
+                setSnackbarMessage("This is a placeholder. Two-factor authentication is not implemented.");
+                setSnackbarVisible(true);
+              }}
             />
           </List.Section>
         </Card.Content>
@@ -505,7 +505,10 @@ const SettingsScreen = () => {
                   icon="chevron-right"
                 />
               )}
-              onPress={() => {}}
+              onPress={() => {
+                setSnackbarMessage("This is a placeholder. Terms of Service functionality is not implemented.");
+                setSnackbarVisible(true);
+              }}
             />
             <Divider />
             <List.Item
@@ -522,7 +525,10 @@ const SettingsScreen = () => {
                   icon="chevron-right"
                 />
               )}
-              onPress={() => {}}
+              onPress={() => {
+                setSnackbarMessage("This is a placeholder. Privacy Policy functionality is not implemented.");
+                setSnackbarVisible(true);
+              }}
             />
             <Divider />
             <List.Item
@@ -539,7 +545,10 @@ const SettingsScreen = () => {
                   icon="chevron-right"
                 />
               )}
-              onPress={() => {}}
+              onPress={() => {
+                setSnackbarMessage("This is a placeholder. Help & Support functionality is not implemented.");
+                setSnackbarVisible(true);
+              }}
             />
           </List.Section>
         </Card.Content>

@@ -5,7 +5,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useFocusEffect, useRoute } from "@react-navigation/native";
 import bookService from "../../services/bookService";
 import userService from "../../services/userService";
-import CirculationListItem from "../../components/staff/CirculationListItem";
+import CirculationListItem from "../../components/books/CirculationListItem";
 import EmptyState from "../../components/common/EmptyState";
 import ErrorDisplay from "../../components/common/ErrorDisplay";
 
