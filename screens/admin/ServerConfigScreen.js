@@ -79,7 +79,7 @@ const ServerConfigScreen = () => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={["top"]}>
-      <StatusBar style={theme.dark ? "light" : "dark"} />
+      <StatusBar style={""} />
 
       <Appbar.Header style={[styles.header, { backgroundColor: theme.colors.surface }]} elevated>
         <Appbar.BackAction onPress={() => navigation.goBack()} />

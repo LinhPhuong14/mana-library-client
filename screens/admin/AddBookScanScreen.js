@@ -40,9 +40,9 @@ const AddBookScanScreen = () => {
   const fetchBookData = (isbn) => {
     setLoading(true)
 
-    // Simulate API call to fetch book data by ISBN
+    
     setTimeout(() => {
-      // Mock data - in a real app, you would fetch this from an API
+      // Mock data 
       if (isbn === "9786045161753") {
         setBookData({
           title: "Đắc Nhân Tâm",
@@ -87,7 +87,7 @@ const AddBookScanScreen = () => {
   if (hasPermission === null) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={["top"]}>
-        <StatusBar style={theme.dark ? "light" : "dark"} />
+        <StatusBar style={"dark"} />
         <View style={styles.messageContainer}>
           <Text style={[styles.messageText, { color: theme.colors.text }]}>Đang yêu cầu quyền truy cập camera...</Text>
         </View>
@@ -98,7 +98,7 @@ const AddBookScanScreen = () => {
   if (hasPermission === false) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={["top"]}>
-        <StatusBar style={theme.dark ? "light" : "dark"} />
+        <StatusBar style={"dark"} />
         <View style={styles.messageContainer}>
           <MaterialCommunityIcons name="camera-off" size={60} color={theme.colors.error} />
           <Text style={[styles.messageText, { color: theme.colors.text }]}>Không có quyền truy cập camera.</Text>

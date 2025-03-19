@@ -88,7 +88,7 @@ const AddBookManualScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
 
       <SafeAreaView edges={["top"]} style={styles.header}>
         <View style={styles.headerContent}>

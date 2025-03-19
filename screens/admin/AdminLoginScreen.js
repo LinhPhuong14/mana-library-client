@@ -44,7 +44,7 @@ const AdminLoginScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar style={theme.dark ? "light" : "dark"} />
+      <StatusBar style={"dark"} />
 
       <LinearGradient colors={theme.dark ? ["#121212", "#1e1e1e"] : ["#f5f5f5", "#ffffff"]} style={styles.background} />
 

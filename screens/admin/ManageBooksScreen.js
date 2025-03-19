@@ -8,7 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import Animated, { FadeIn } from "react-native-reanimated"
 
-// Mock data with updated structure to match the screenshot
+// Mock data 
 const mockBooks = [
   {
     id: "1",
@@ -147,7 +147,7 @@ const ManageBooksScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+      <StatusBar barStyle="dark-content" backgroundColor="#000000" />
 
       <SafeAreaView edges={["top"]} style={styles.header}>
         <View style={styles.headerContent}>
