@@ -65,7 +65,7 @@ const RegisterScreen = ({ navigation }) => {
                 )}
             </TouchableOpacity>
 
-            {error && <Text style={styles.errorText}>{error}</Text>}
+            
             <View style={styles.buttonContainer}>
                 <Text style={styles}>
                     Already registered?{" "}
