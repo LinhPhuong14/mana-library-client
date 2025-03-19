@@ -26,6 +26,9 @@
     },
     "extra": {
       "serverUrl": "http://localhost:3000"
-    }
+    },
+    "plugins": [
+      "expo-barcode-scanner"
+    ]
   }
 }

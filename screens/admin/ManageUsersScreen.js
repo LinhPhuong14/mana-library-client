@@ -5,138 +5,136 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 
-// Demo book data
-const DEMO_BOOKS = [
+// Demo user data
+const DEMO_USERS = [
   {
     id: "1",
-    title: "Atomic Habits",
-    author: "James Clear",
-    isbn: "9781847941831",
-    category: "Self-Help",
-    status: "available",
-    copies: 5,
-    availableCopies: 3,
+    name: "Emma Wilson",
+    email: "emma.wilson@example.com",
+    role: "Student",
+    memberSince: "2023-05-18",
+    status: "active",
+    booksCheckedOut: 3,
+    fines: "$0.00",
   },
   {
     id: "2",
-    title: "Designing Data-Intensive Applications",
-    author: "Martin Kleppmann",
-    isbn: "9781449373320",
-    category: "Technology",
-    status: "available",
-    copies: 2,
-    availableCopies: 0,
+    name: "Michael Brown",
+    email: "michael.brown@example.com",
+    role: "Teacher",
+    memberSince: "2023-07-02",
+    status: "active",
+    booksCheckedOut: 1,
+    fines: "$0.00",
   },
   {
     id: "3",
-    title: "Clean Code",
-    author: "Robert C. Martin",
-    isbn: "9780132350884",
-    category: "Technology",
-    status: "available",
-    copies: 3,
-    availableCopies: 1,
+    name: "Sophia Davis",
+    email: "sophia.davis@example.com",
+    role: "Student",
+    memberSince: "2023-01-25",
+    status: "restricted",
+    booksCheckedOut: 2,
+    fines: "$5.50",
   },
   {
     id: "4",
-    title: "The Psychology of Money",
-    author: "Morgan Housel",
-    isbn: "9780857197689",
-    category: "Finance",
-    status: "available",
-    copies: 4,
-    availableCopies: 2,
+    name: "James Miller",
+    email: "james.miller@example.com",
+    role: "Teacher",
+    memberSince: "2022-11-14",
+    status: "active",
+    booksCheckedOut: 0,
+    fines: "$0.00",
   },
   {
     id: "5",
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    isbn: "9780061120084",
-    category: "Fiction",
-    status: "available",
-    copies: 6,
-    availableCopies: 4,
+    name: "Olivia Johnson",
+    email: "olivia.johnson@example.com",
+    role: "Student",
+    memberSince: "2023-03-30",
+    status: "active",
+    booksCheckedOut: 1,
+    fines: "$2.25",
   },
   {
     id: "6",
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    isbn: "9780743273565",
-    category: "Fiction",
-    status: "available",
-    copies: 3,
-    availableCopies: 3,
+    name: "William Taylor",
+    email: "william.taylor@example.com",
+    role: "Student",
+    memberSince: "2022-09-07",
+    status: "inactive",
+    booksCheckedOut: 0,
+    fines: "$0.00",
   },
   {
     id: "7",
-    title: "Educated",
-    author: "Tara Westover",
-    isbn: "9780399590504",
-    category: "Memoir",
-    status: "available",
-    copies: 2,
-    availableCopies: 1,
+    name: "Ava Martinez",
+    email: "ava.martinez@example.com",
+    role: "Teacher",
+    memberSince: "2023-02-19",
+    status: "active",
+    booksCheckedOut: 4,
+    fines: "$0.00",
   },
   {
     id: "8",
-    title: "The Alchemist",
-    author: "Paulo Coelho",
-    isbn: "9780062315007",
-    category: "Fiction",
-    status: "available",
-    copies: 8,
-    availableCopies: 5,
+    name: "Noah Anderson",
+    email: "noah.anderson@example.com",
+    role: "Student",
+    memberSince: "2023-04-12",
+    status: "active",
+    booksCheckedOut: 1,
+    fines: "$0.00",
   },
 ];
 
-// Category options for filtering
-const CATEGORIES = ["All", "Fiction", "Technology", "Self-Help", "Finance", "Memoir"];
+// Role options for filtering
+const ROLES = ["All", "Student", "Teacher", "Staff"];
 
-const ManageBooksScreen = ({ navigation }) => {
-  const [books, setBooks] = useState(DEMO_BOOKS);
-  const [filteredBooks, setFilteredBooks] = useState(DEMO_BOOKS);
+const ManageUsersScreen = ({ navigation }) => {
+  const [users, setUsers] = useState(DEMO_USERS);
+  const [filteredUsers, setFilteredUsers] = useState(DEMO_USERS);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedRole, setSelectedRole] = useState("All");
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
-  const [sortOrder, setSortOrder] = useState("asc"); // 'asc' or 'desc'
-  const [sortBy, setSortBy] = useState("title"); // 'title', 'author', 'category'
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortBy, setSortBy] = useState("name");
 
   useEffect(() => {
-    filterBooks();
-  }, [searchQuery, selectedCategory, sortBy, sortOrder]);
+    filterUsers();
+  }, [searchQuery, selectedRole, sortBy, sortOrder]);
 
-  const filterBooks = () => {
-    let result = [...books];
+  const filterUsers = () => {
+    let result = [...users];
 
     // Apply search filter
     if (searchQuery) {
-      result = result.filter(
-        (book) => book.title.toLowerCase().includes(searchQuery.toLowerCase()) || book.author.toLowerCase().includes(searchQuery.toLowerCase()) || book.isbn.includes(searchQuery)
-      );
+      result = result.filter((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()) || user.email.toLowerCase().includes(searchQuery.toLowerCase()));
     }
 
-    // Apply category filter
-    if (selectedCategory !== "All") {
-      result = result.filter((book) => book.category === selectedCategory);
+    // Apply role filter
+    if (selectedRole !== "All") {
+      result = result.filter((user) => user.role === selectedRole);
     }
 
     // Apply sorting
     result.sort((a, b) => {
       let comparison = 0;
-      if (sortBy === "title") {
-        comparison = a.title.localeCompare(b.title);
-      } else if (sortBy === "author") {
-        comparison = a.author.localeCompare(b.author);
-      } else if (sortBy === "category") {
-        comparison = a.category.localeCompare(b.category);
+      if (sortBy === "name") {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortBy === "email") {
+        comparison = a.email.localeCompare(b.email);
+      } else if (sortBy === "memberSince") {
+        comparison = new Date(a.memberSince) - new Date(b.memberSince);
       }
 
       return sortOrder === "asc" ? comparison : -comparison;
     });
 
-    setFilteredBooks(result);
+    setFilteredUsers(result);
   };
 
   const handleRefresh = () => {
@@ -147,87 +145,110 @@ const ManageBooksScreen = ({ navigation }) => {
     }, 1000);
   };
 
-  const handleAddBook = () => {
-    // Navigate to AddBookManual screen
-    navigation.navigate("AddBookManual");
+  const handleAddUser = () => {
+    navigation.navigate("UserDetail", { isAdding: true });
   };
 
-  const handleScanBook = () => {
-    // Navigate to AddBookScan screen
-    navigation.navigate("AddBookScan");
+  const handleEditUser = (user) => {
+    navigation.navigate("UserDetail", { user, isEditing: true });
   };
 
-  const handleEditBook = (book) => {
-    // Navigate to edit screen with book data
-    navigation.navigate("AddBookManual", { book, isEditing: true });
-  };
-
-  const handleDeleteBook = (bookId) => {
-    Alert.alert("Delete Book", "Are you sure you want to delete this book? This action cannot be undone.", [
+  const handleDeleteUser = (userId) => {
+    Alert.alert("Delete User", "Are you sure you want to delete this user? This action cannot be undone.", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",
         style: "destructive",
         onPress: () => {
-          // In a real app, this would call the API to delete the book
+          // In a real app, this would call the API to delete the user
           setLoading(true);
           setTimeout(() => {
-            const updatedBooks = books.filter((book) => book.id !== bookId);
-            setBooks(updatedBooks);
-            setFilteredBooks(filteredBooks.filter((book) => book.id !== bookId));
+            const updatedUsers = users.filter((user) => user.id !== userId);
+            setUsers(updatedUsers);
+            setFilteredUsers(filteredUsers.filter((user) => user.id !== userId));
             setLoading(false);
-            Alert.alert("Success", "Book deleted successfully");
+            Alert.alert("Success", "User deleted successfully");
           }, 500);
         },
       },
     ]);
   };
 
-  const handleImportBooks = () => {
-    Alert.alert("Import Books", "This would open a file picker to import books from CSV/Excel.", [{ text: "OK" }]);
+  const handleImportUsers = () => {
+    Alert.alert("Import Users", "This would open a file picker to import users from CSV/Excel.", [{ text: "OK" }]);
   };
 
-  const handleExportBooks = () => {
+  const handleExportUsers = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      Alert.alert("Export Books", "Books catalog exported successfully. In a real app, this would generate a file for download.", [{ text: "OK" }]);
+      Alert.alert("Export Users", "Users data exported successfully. In a real app, this would generate a file for download.", [{ text: "OK" }]);
     }, 1000);
   };
 
-  const renderBookItem = ({ item }) => {
-    const availabilityColor = item.availableCopies === 0 ? "#ef4444" : item.availableCopies < item.copies / 2 ? "#f97316" : "#22c55e";
+  const handleViewUser = (user) => {
+    navigation.navigate("UserDetail", { user, isViewing: true });
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "active":
+        return "#22c55e"; // green
+      case "inactive":
+        return "#757575"; // gray
+      case "restricted":
+        return "#f97316"; // orange
+      default:
+        return "#ef4444"; // red
+    }
+  };
+
+  const renderUserItem = ({ item }) => {
+    const statusColor = getStatusColor(item.status);
 
     return (
-      <View style={styles.bookItem}>
-        <View style={styles.bookInfo}>
-          <Text style={styles.bookTitle}>{item.title}</Text>
-          <Text style={styles.bookAuthor}>by {item.author}</Text>
-          <View style={styles.bookDetails}>
-            <Text style={styles.bookDetail}>
-              <Text style={styles.detailLabel}>ISBN: </Text>
-              {item.isbn}
+      <TouchableOpacity
+        style={styles.userItem}
+        onPress={() => handleViewUser(item)}
+      >
+        <View style={styles.userInfo}>
+          <View style={styles.nameRow}>
+            <Text style={styles.userName}>{item.name}</Text>
+            <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
+              <Text style={styles.statusText}>{item.status}</Text>
+            </View>
+          </View>
+
+          <Text style={styles.userEmail}>{item.email}</Text>
+
+          <View style={styles.userDetails}>
+            <Text style={styles.userDetail}>
+              <Text style={styles.detailLabel}>Role: </Text>
+              {item.role}
             </Text>
-            <Text style={styles.bookDetail}>
-              <Text style={styles.detailLabel}>Category: </Text>
-              {item.category}
+            <Text style={styles.userDetail}>
+              <Text style={styles.detailLabel}>Member since: </Text>
+              {item.memberSince}
             </Text>
-            <View style={styles.availabilityContainer}>
-              <Text style={styles.detailLabel}>Availability: </Text>
-              <View style={styles.copiesContainer}>
-                <View style={[styles.availabilityIndicator, { backgroundColor: availabilityColor }]} />
-                <Text style={styles.bookDetail}>
-                  {item.availableCopies}/{item.copies} copies
-                </Text>
-              </View>
+            <View style={styles.statsContainer}>
+              <Text style={styles.userDetail}>
+                <Text style={styles.detailLabel}>Books out: </Text>
+                {item.booksCheckedOut}
+              </Text>
+              {item.fines !== "$0.00" && (
+                <View style={styles.finesContainer}>
+                  <Text style={styles.detailLabel}>Fines: </Text>
+                  <Text style={styles.finesText}>{item.fines}</Text>
+                </View>
+              )}
             </View>
           </View>
         </View>
 
-        <View style={styles.bookActions}>
+        <View style={styles.userActions}>
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => handleEditBook(item)}
+            onPress={() => handleEditUser(item)}
           >
             <Ionicons
               name="create-outline"
@@ -237,7 +258,7 @@ const ManageBooksScreen = ({ navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => handleDeleteBook(item.id)}
+            onPress={() => handleDeleteUser(item.id)}
           >
             <Ionicons
               name="trash-outline"
@@ -246,7 +267,7 @@ const ManageBooksScreen = ({ navigation }) => {
             />
           </TouchableOpacity>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -266,7 +287,7 @@ const ManageBooksScreen = ({ navigation }) => {
             color="#FFFFFF"
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Manage Books</Text>
+        <Text style={styles.headerTitle}>Manage Users</Text>
         <View style={styles.headerRight}>
           <TouchableOpacity
             style={styles.headerIconButton}
@@ -291,7 +312,7 @@ const ManageBooksScreen = ({ navigation }) => {
         />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search books by title, author, or ISBN"
+          placeholder="Search by name or email"
           placeholderTextColor="#757575"
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -310,44 +331,44 @@ const ManageBooksScreen = ({ navigation }) => {
         ) : null}
       </View>
 
-      {/* Category pills */}
-      <View style={styles.categoriesContainer}>
+      {/* Role filters */}
+      <View style={styles.rolesContainer}>
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
-          data={CATEGORIES}
+          data={ROLES}
           keyExtractor={(item) => item}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={[styles.categoryPill, selectedCategory === item && styles.selectedCategoryPill]}
-              onPress={() => setSelectedCategory(item)}
+              style={[styles.rolePill, selectedRole === item && styles.selectedRolePill]}
+              onPress={() => setSelectedRole(item)}
             >
-              <Text style={[styles.categoryText, selectedCategory === item && styles.selectedCategoryText]}>{item}</Text>
+              <Text style={[styles.roleText, selectedRole === item && styles.selectedRoleText]}>{item}</Text>
             </TouchableOpacity>
           )}
         />
       </View>
 
-      {/* Books list */}
+      {/* Users list */}
       <FlatList
-        data={filteredBooks}
+        data={filteredUsers}
         keyExtractor={(item) => item.id}
-        renderItem={renderBookItem}
-        contentContainerStyle={styles.booksList}
+        renderItem={renderUserItem}
+        contentContainerStyle={styles.usersList}
         onRefresh={handleRefresh}
         refreshing={refreshing}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons
-              name="book"
+              name="people"
               size={60}
               color="#757575"
             />
-            <Text style={styles.emptyText}>No books match your filter</Text>
+            <Text style={styles.emptyText}>No users match your filter</Text>
             <TouchableOpacity
               onPress={() => {
                 setSearchQuery("");
-                setSelectedCategory("All");
+                setSelectedRole("All");
               }}
             >
               <Text style={styles.clearFiltersText}>Clear filters</Text>
@@ -360,7 +381,7 @@ const ManageBooksScreen = ({ navigation }) => {
       <View style={styles.bottomActions}>
         <TouchableOpacity
           style={[styles.actionButton, styles.importButton]}
-          onPress={handleImportBooks}
+          onPress={handleImportUsers}
         >
           <Ionicons
             name="cloud-upload-outline"
@@ -372,7 +393,7 @@ const ManageBooksScreen = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.fabButton}
-          onPress={handleAddBook}
+          onPress={handleAddUser}
         >
           <LinearGradient
             colors={["#4568DC", "#B06AB3"]}
@@ -390,7 +411,7 @@ const ManageBooksScreen = ({ navigation }) => {
 
         <TouchableOpacity
           style={[styles.actionButton, styles.exportButton]}
-          onPress={handleExportBooks}
+          onPress={handleExportUsers}
         >
           <Ionicons
             name="cloud-download-outline"
@@ -400,25 +421,6 @@ const ManageBooksScreen = ({ navigation }) => {
           <Text style={styles.actionButtonText}>Export</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Scanner FAB */}
-      <TouchableOpacity
-        style={styles.scanButton}
-        onPress={handleScanBook}
-      >
-        <LinearGradient
-          colors={["#B06AB3", "#4568DC"]}
-          style={styles.scanGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-        >
-          <Ionicons
-            name="barcode-outline"
-            size={24}
-            color="#FFFFFF"
-          />
-        </LinearGradient>
-      </TouchableOpacity>
 
       {/* Filter Modal */}
       <Modal
@@ -435,32 +437,32 @@ const ManageBooksScreen = ({ navigation }) => {
             style={styles.filterModal}
             onStartShouldSetResponder={() => true}
           >
-            <Text style={styles.modalTitle}>Sort Books</Text>
+            <Text style={styles.modalTitle}>Sort Users</Text>
 
             <Text style={styles.modalSectionTitle}>Sort by</Text>
             <View style={styles.radioGroup}>
               <TouchableOpacity
                 style={styles.radioButton}
-                onPress={() => setSortBy("title")}
+                onPress={() => setSortBy("name")}
               >
-                <View style={styles.radioCircle}>{sortBy === "title" && <View style={styles.radioFilled} />}</View>
-                <Text style={styles.radioLabel}>Title</Text>
+                <View style={styles.radioCircle}>{sortBy === "name" && <View style={styles.radioFilled} />}</View>
+                <Text style={styles.radioLabel}>Name</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.radioButton}
-                onPress={() => setSortBy("author")}
+                onPress={() => setSortBy("email")}
               >
-                <View style={styles.radioCircle}>{sortBy === "author" && <View style={styles.radioFilled} />}</View>
-                <Text style={styles.radioLabel}>Author</Text>
+                <View style={styles.radioCircle}>{sortBy === "email" && <View style={styles.radioFilled} />}</View>
+                <Text style={styles.radioLabel}>Email</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.radioButton}
-                onPress={() => setSortBy("category")}
+                onPress={() => setSortBy("memberSince")}
               >
-                <View style={styles.radioCircle}>{sortBy === "category" && <View style={styles.radioFilled} />}</View>
-                <Text style={styles.radioLabel}>Category</Text>
+                <View style={styles.radioCircle}>{sortBy === "memberSince" && <View style={styles.radioFilled} />}</View>
+                <Text style={styles.radioLabel}>Join Date</Text>
               </TouchableOpacity>
             </View>
 
@@ -562,11 +564,11 @@ const styles = StyleSheet.create({
   clearButton: {
     padding: 6,
   },
-  categoriesContainer: {
+  rolesContainer: {
     paddingHorizontal: 12,
     marginBottom: 8,
   },
-  categoryPill: {
+  rolePill: {
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
@@ -574,45 +576,60 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginBottom: 8,
   },
-  selectedCategoryPill: {
+  selectedRolePill: {
     backgroundColor: "#4568DC",
   },
-  categoryText: {
+  roleText: {
     color: "#FFFFFF",
     fontSize: 14,
   },
-  selectedCategoryText: {
+  selectedRoleText: {
     fontWeight: "bold",
   },
-  booksList: {
+  usersList: {
     paddingHorizontal: 16,
     paddingBottom: 100, // Space for bottom actions
   },
-  bookItem: {
+  userItem: {
     flexDirection: "row",
     backgroundColor: "#1E1E1E",
     borderRadius: 8,
     padding: 16,
     marginBottom: 12,
   },
-  bookInfo: {
+  userInfo: {
     flex: 1,
   },
-  bookTitle: {
+  nameRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  userName: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#FFFFFF",
-    marginBottom: 4,
   },
-  bookAuthor: {
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+  statusText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  userEmail: {
     fontSize: 14,
     color: "#B06AB3",
     marginBottom: 8,
   },
-  bookDetails: {
+  userDetails: {
     gap: 4,
   },
-  bookDetail: {
+  userDetail: {
     fontSize: 14,
     color: "#FFFFFF",
   },
@@ -620,21 +637,21 @@ const styles = StyleSheet.create({
     color: "#757575",
     fontSize: 14,
   },
-  availabilityContainer: {
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  finesContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
-  copiesContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  finesText: {
+    color: "#ef4444",
+    fontSize: 14,
   },
-  availabilityIndicator: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 6,
-  },
-  bookActions: {
+  userActions: {
     justifyContent: "space-around",
     paddingLeft: 16,
   },
@@ -691,21 +708,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   fabGradient: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  scanButton: {
-    position: "absolute",
-    right: 16,
-    bottom: 100,
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    overflow: "hidden",
-  },
-  scanGradient: {
     width: "100%",
     height: "100%",
     justifyContent: "center",
@@ -791,4 +793,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ManageBooksScreen;
+export default ManageUsersScreen;

@@ -1,22 +1,47 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useRef } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
 const SplashScreen = ({ navigation }) => {
+  const [isLogoPressed, setIsLogoPressed] = useState(false);
+  const timerRef = useRef(null);
+
+  const handleLogoPress = () => {
+    setIsLogoPressed(true);
+
+    timerRef.current = setTimeout(() => {
+      // Use a more direct navigation approach
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Admin" }],
+      });
+      setIsLogoPressed(false);
+    }, 3000);
+  };
+
+  const handleLogoRelease = () => {
+    clearTimeout(timerRef.current);
+    setIsLogoPressed(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
 
-      <View style={styles.logoContainer}>
+      <Pressable
+        style={[styles.logoContainer, isLogoPressed && styles.logoPressed]}
+        onPressIn={handleLogoPress}
+        onPressOut={handleLogoRelease}
+      >
         <Ionicons
           name="library"
           size={120}
-          color="#8A2BE2"
+          color={isLogoPressed ? "#9D50BB" : "#8A2BE2"}
         />
-      </View>
+      </Pressable>
 
       <View style={styles.content}>
         <Text style={styles.tagline}>Knowledge is power! 📚✨</Text>
@@ -62,6 +87,11 @@ const styles = StyleSheet.create({
     marginTop: 200,
     alignItems: "center",
     justifyContent: "center",
+    padding: 10,
+    borderRadius: 60,
+  },
+  logoPressed: {
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   content: {
     alignItems: "center",

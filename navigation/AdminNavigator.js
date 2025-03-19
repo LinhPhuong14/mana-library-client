@@ -1,61 +1,60 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { safeScreen, importScreen } from "../utils/screenUtils";
+import AdminLogin from "../screens/admin/AdminLoginScreen";
+import SystemMetricsScreen from "../screens/admin/SystemMetricScreen";
+import ManageBooksScreen from "../screens/admin/ManageBooksScreen";
+import AddBookManualScreen from "../screens/admin/AddBookManualScreen";
+import AddBookScanScreen from "../screens/admin/AddBookScanScreen";
+import ServerConfigScreen from "../screens/admin/ServerConfigScreen";
+import ManageUsersScreen from "../screens/admin/ManageUsersScreen";
+import UserDetailScreen from "../screens/admin/UserDetailScreen";
 
 const AdminStack = createStackNavigator();
 
-// Use placeholders for screens that can't be resolved
-const AdminLoginScreen = importScreen("../screens/admin/AdminLoginScreen", "Admin Login");
-const SystemMetricsScreen = importScreen("../screens/admin/SystemMetricsScreen", "System Metrics");
-const ManageBooksScreen = importScreen("../screens/admin/ManageBooksScreen", "Manage Books");
-const AddBookManualScreen = importScreen("../screens/admin/AddBookManualScreen", "Add Book Manually");
-const AddBookScanScreen = importScreen("../screens/admin/AddBookScanScreen", "Scan Book");
-const ManageUsersScreen = importScreen("../screens/admin/ManageUsersScreen", "Manage Users");
-const UserDetailScreen = importScreen("../screens/admin/UserDetailScreen", "User Details");
-const ServerConfigScreen = importScreen("../screens/admin/ServerConfigScreen", "Server Configuration");
-
 const AdminNavigator = () => {
   return (
-    <AdminStack.Navigator>
+    <AdminStack.Navigator initialRouteName="AdminLogin">
       <AdminStack.Screen
         name="AdminLogin"
-        component={safeScreen(AdminLoginScreen, "Admin Login")}
+        component={AdminLogin}
         options={{ headerShown: false }}
       />
       <AdminStack.Screen
         name="SystemMetrics"
-        component={safeScreen(SystemMetricsScreen, "System Metrics")}
-        options={{ title: "Dashboard" }}
+        component={SystemMetricsScreen}
+        // options={{ title: "Dashboard" }}
+        options={{ headerShown: false }}
       />
       <AdminStack.Screen
         name="ManageBooks"
-        component={safeScreen(ManageBooksScreen, "Manage Books")}
-        options={{ title: "Manage Books" }}
+        component={ManageBooksScreen}
+        options={{ headerShown: false }}
       />
       <AdminStack.Screen
         name="AddBookManual"
-        component={safeScreen(AddBookManualScreen, "Add Book Manually")}
-        options={{ title: "Add Book" }}
+        component={AddBookManualScreen}
+        options={{ headerShown: false }}
       />
       <AdminStack.Screen
         name="AddBookScan"
-        component={safeScreen(AddBookScanScreen, "Scan Book")}
-        options={{ title: "Scan Book" }}
+        component={AddBookScanScreen}
+        options={{ headerShown: false }}
       />
       <AdminStack.Screen
         name="ManageUsers"
-        component={safeScreen(ManageUsersScreen, "Manage Users")}
-        options={{ title: "Manage Users" }}
+        component={ManageUsersScreen}
+        options={{ headerShown: false }}
       />
       <AdminStack.Screen
         name="UserDetail"
-        component={safeScreen(UserDetailScreen, "User Details")}
-        options={{ title: "User Details" }}
+        component={UserDetailScreen}
+        options={{ headerShown: false }}
       />
       <AdminStack.Screen
         name="ServerConfig"
-        component={safeScreen(ServerConfigScreen, "Server Configuration")}
-        options={{ title: "Server Configuration" }}
+        component={ServerConfigScreen}
+        options={{ headerShown: false }}
       />
     </AdminStack.Navigator>
   );
