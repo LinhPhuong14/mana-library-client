@@ -9,7 +9,6 @@ import DarkTheme from "./theme/DarkTheme";
 import AuthNavigator from "./navigation/AuthNavigator";
 import UserNavigator from "./navigation/UserNavigator";
 import AdminNavigator from "./navigation/AdminNavigator";
-import LibrarianNavigator from "./navigation/LibrarianNavigator";
 import SplashScreen from "./screens/SplashScreen";
 
 // Contexts
@@ -50,10 +49,7 @@ const Navigation = () => {
           name="Admin"
           component={AdminNavigator}
         />
-        <Stack.Screen
-          name="Librarian"
-          component={LibrarianNavigator}
-        />
+
         <Stack.Screen
           name="User"
           component={UserNavigator}

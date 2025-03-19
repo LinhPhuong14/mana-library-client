@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
-import { Avatar, Card, Divider } from "react-native-paper";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { Avatar } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 
 const ProfileScreen = () => {
     const [user, setUser] = useState({
@@ -15,61 +17,81 @@ const ProfileScreen = () => {
     });
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            {/* Avatar */}
-            <View style={styles.avatarContainer}>
-                <Avatar.Image size={100} source={{ uri: user.avatar }} />
-                <Text style={styles.username}>{user.username}</Text>
-            </View>
+        <SafeAreaView style={styles.safeArea}>
+            <ScrollView contentContainerStyle={styles.container}>
+                {/* Avatar */}
+                <View style={styles.avatarContainer}>
+                    <Avatar.Image size={100} source={{ uri: user.avatar }} />
+                    <Text style={styles.username}>{user.username}</Text>
+                </View>
 
-            {/* User Information */}
-            <Card style={styles.card}>
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>Date of Birth:</Text>
-                    <Text style={styles.value}>{user.dob}</Text>
-                </View>
-                <Divider />
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>Email:</Text>
-                    <Text style={styles.value}>{user.email}</Text>
-                </View>
-                <Divider />
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>Address:</Text>
-                    <Text style={styles.value}>{user.address}</Text>
-                </View>
-            </Card>
+                {/* User Information */}
+                <LinearGradient
+                    colors={["#4568DC", "#B06AB3"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.card}
+                >
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Date of Birth:</Text>
+                        <Text style={styles.value}>{user.dob}</Text>
+                    </View>
+                    <View style={styles.divider} />
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Email:</Text>
+                        <Text style={styles.value}>{user.email}</Text>
+                    </View>
+                    <View style={styles.divider} />
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Address:</Text>
+                        <Text style={styles.value}>{user.address}</Text>
+                    </View>
+                </LinearGradient>
 
-            {/* Book Statistics */}
-            <Card style={styles.card}>
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>Books Borrowed:</Text>
-                    <Text style={styles.value}>{user.booksBorrowed}</Text>
-                </View>
-                <Divider />
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>Books Read:</Text>
-                    <Text style={styles.value}>{user.booksRead}</Text>
-                </View>
-            </Card>
+                {/* Book Statistics */}
+                <LinearGradient
+                    colors={["#FF512F", "#DD2476"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.card}
+                >
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Books Borrowed:</Text>
+                        <Text style={styles.value}>{user.booksBorrowed}</Text>
+                    </View>
+                    <View style={styles.divider} />
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Books Read:</Text>
+                        <Text style={styles.value}>{user.booksRead}</Text>
+                    </View>
+                </LinearGradient>
 
-            {/* Currently Borrowing */}
-            <Card style={styles.card}>
-                <Text style={styles.sectionTitle}>Books Borrowing</Text>
-                {user.booksBorrowing.map((book, index) => (
-                    <Text key={index} style={styles.bookItem}>
-                        • {book}
-                    </Text>
-                ))}
-            </Card>
-        </ScrollView>
+                {/* Currently Borrowing */}
+                <LinearGradient
+                    colors={["#8E2DE2", "#4A00E0"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.card}
+                >
+                    <Text style={styles.sectionTitle}>Books Borrowing</Text>
+                    {user.booksBorrowing.map((book, index) => (
+                        <Text key={index} style={styles.bookItem}>
+                            • {book}
+                        </Text>
+                    ))}
+                </LinearGradient>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: "#121212",
+    },
     container: {
         padding: 20,
-        backgroundColor: "#f5f5f5",
         flexGrow: 1,
     },
     avatarContainer: {
@@ -79,14 +101,18 @@ const styles = StyleSheet.create({
     username: {
         fontSize: 22,
         fontWeight: "bold",
+        color: "#FFFFFF",
         marginTop: 10,
     },
     card: {
-        backgroundColor: "#fff",
         padding: 15,
-        borderRadius: 10,
+        borderRadius: 15,
         marginBottom: 15,
-        elevation: 3,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 3, // For Android shadows
     },
     infoRow: {
         flexDirection: "row",
@@ -96,17 +122,26 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         fontWeight: "bold",
+        color: "#FFFFFF",
     },
     value: {
         fontSize: 16,
+        color: "#FFFFFF",
+    },
+    divider: {
+        height: 1,
+        backgroundColor: "rgba(255, 255, 255, 0.2)",
+        marginVertical: 8,
     },
     sectionTitle: {
         fontSize: 18,
         fontWeight: "bold",
+        color: "#FFFFFF",
         marginBottom: 10,
     },
     bookItem: {
         fontSize: 16,
+        color: "#FFFFFF",
         paddingVertical: 2,
     },
 });
