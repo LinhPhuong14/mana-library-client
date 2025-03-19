@@ -1,50 +1,47 @@
 import React, { useState, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
 const SplashScreen = ({ navigation }) => {
-  const [isLongPressing, setIsLongPressing] = useState(false);
-  const longPressTimer = useRef(null);
+  const [isLogoPressed, setIsLogoPressed] = useState(false);
+  const timerRef = useRef(null);
 
-  const handlePressIn = () => {
-    setIsLongPressing(true);
-    // Set a timer for 1 second
-    longPressTimer.current = setTimeout(() => {
-      // Navigate to StaffLogin screen
-      navigation.navigate("Staff", { screen: "StaffLogin" });
-      setIsLongPressing(false);
-    }, 1000);
+  const handleLogoPress = () => {
+    setIsLogoPressed(true);
+
+    timerRef.current = setTimeout(() => {
+      // Use a more direct navigation approach
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Admin" }],
+      });
+      setIsLogoPressed(false);
+    }, 3000);
   };
 
-  const handlePressOut = () => {
-    // Clear the timer if press is released before timeout
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-    setIsLongPressing(false);
+  const handleLogoRelease = () => {
+    clearTimeout(timerRef.current);
+    setIsLogoPressed(false);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
 
-      <View style={styles.logoContainer}>
-        <TouchableOpacity
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          activeOpacity={0.9}
-        >
-          <Ionicons
-            name="library"
-            size={120}
-            color={isLongPressing ? "#9B59B6" : "#8A2BE2"}
-          />
-        </TouchableOpacity>
-      </View>
+      <Pressable
+        style={[styles.logoContainer, isLogoPressed && styles.logoPressed]}
+        onPressIn={handleLogoPress}
+        onPressOut={handleLogoRelease}
+      >
+        <Ionicons
+          name="library"
+          size={120}
+          color={isLogoPressed ? "#9D50BB" : "#8A2BE2"}
+        />
+      </Pressable>
 
       <View style={styles.content}>
         <Text style={styles.tagline}>Knowledge is power! 📚✨</Text>
@@ -90,6 +87,11 @@ const styles = StyleSheet.create({
     marginTop: 200,
     alignItems: "center",
     justifyContent: "center",
+    padding: 10,
+    borderRadius: 60,
+  },
+  logoPressed: {
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   content: {
     alignItems: "center",
@@ -133,16 +135,6 @@ const styles = StyleSheet.create({
   versionText: {
     color: "#757575",
     marginBottom: 10,
-    fontSize: 12,
-  },
-  progressIndicator: {
-    position: "absolute",
-    bottom: -25,
-    width: "100%",
-    alignItems: "center",
-  },
-  progressText: {
-    color: "#9B59B6",
     fontSize: 12,
   },
 });
