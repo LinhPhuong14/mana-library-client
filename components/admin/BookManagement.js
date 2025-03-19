@@ -5,6 +5,7 @@ import { Text, IconButton, Surface, useTheme } from "react-native-paper"
 const BookManagement = ({ book, onEdit, onDelete, onToggleAvailability }) => {
   const theme = useTheme()
 
+  //Setup colors
   const getAvailabilityColor = (available, total) => {
     if (available === 0) return "#ff4d4d" // Red
     if (available < total / 2) return "#ff9933" // Orange

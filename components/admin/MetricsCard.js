@@ -7,6 +7,7 @@ import Animated, { FadeInUp } from "react-native-reanimated"
 const MetricsCard = ({ title, value, icon, color, subtitle, index = 0 }) => {
   const theme = useTheme()
 
+  //
   return (
     <Animated.View entering={FadeInUp.delay(index * 100).duration(400)} style={styles.container}>
       <Surface style={[styles.surface, { backgroundColor: theme.colors.surface }]} elevation={2}>
