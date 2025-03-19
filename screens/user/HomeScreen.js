@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, FlatList, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"; // Import SafeAreaView
 import { LinearGradient } from "expo-linear-gradient";
+import ChatScreen from "../auth/ChatScreen";
 
 const recommendedBooks = [
     {
@@ -73,6 +74,7 @@ const HomeScreen = () => {
                         )}
                     />
                 </View>
+                <ChatScreen></ChatScreen>
             </ScrollView>
         </SafeAreaView>
     );
