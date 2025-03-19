@@ -1,21 +1,20 @@
 import React from "react";
-import { View, Text, FlatList, Image, StyleSheet, ScrollView } from "react-native";
+import { View, Text, FlatList, StyleSheet, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; // Import SafeAreaView
+import { LinearGradient } from "expo-linear-gradient";
 
 const recommendedBooks = [
     {
         title: "The Great Gatsby",
         description: "A classic novel set in the Roaring Twenties.",
-        image: { uri: "https://plus.unsplash.com/premium_photo-1677567996070-68fa4181775a?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
     },
     {
         title: "To Kill a Mockingbird",
         description: "A profound novel about racial injustice.",
-        image: { uri: "https://plus.unsplash.com/premium_photo-1677567996070-68fa4181775a?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
     },
     {
         title: "1984",
         description: "A dystopian novel about totalitarianism.",
-        image: { uri: "https://plus.unsplash.com/premium_photo-1677567996070-68fa4181775a?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
     },
 ];
 
@@ -27,72 +26,84 @@ const borrowedBooks = [
 
 const HomeScreen = () => {
     return (
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-            <Text style={styles.greeting}>Good morning,</Text>
-            <Text style={styles.username}>User!</Text>
-            <Text style={styles.stat}>You have completed <Text style={styles.bold}>32</Text> books so far.</Text>
-            <Text style={styles.stat}>You are lending <Text style={styles.bold}>2</Text> books.</Text>
+        <SafeAreaView style={styles.safeArea}> {/* Wrap everything in SafeAreaView */}
+            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+                <Text style={styles.greeting}>Good morning,</Text>
+                <Text style={styles.username}>User!</Text>
+                <Text style={styles.stat}>You have completed <Text style={styles.bold}>32</Text> books so far.</Text>
+                <Text style={styles.stat}>You are lending <Text style={styles.bold}>2</Text> books.</Text>
 
-            {/* Recommended Books */}
-            <View style={styles.recommendedBooks}>
-                <Text style={styles.sectionTitle}>We think you'll also like these</Text>
-                <FlatList
-                    data={recommendedBooks}
-                    keyExtractor={(item) => item.title}
-                    nestedScrollEnabled
-                    scrollEnabled={false} // Prevent FlatList from scrolling inside ScrollView
-                    renderItem={({ item }) => (
-                        <View style={styles.bookCard}>
-                            <View style={styles.bookInfo}>
-                                <Text style={styles.bookTitle}>{item.title}</Text>
-                                <Text style={styles.bookDescription}>{item.description}</Text>
+                {/* Recommended Books */}
+                <View style={styles.recommendedBooks}>
+                    <Text style={styles.sectionTitle}>We think you'll also like these</Text>
+                    <FlatList
+                        data={recommendedBooks}
+                        keyExtractor={(item) => item.title}
+                        nestedScrollEnabled
+                        scrollEnabled={false}
+                        renderItem={({ item }) => (
+                            <LinearGradient
+                                colors={["#4568DC", "#B06AB3"]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.bookCard}
+                            >
+                                <View style={styles.bookInfo}>
+                                    <Text style={styles.bookTitle}>{item.title}</Text>
+                                    <Text style={styles.bookDescription}>{item.description}</Text>
+                                </View>
+                            </LinearGradient>
+                        )}
+                    />
+                </View>
+
+                {/* Borrowed Books */}
+                <View style={styles.borrowedBooks}>
+                    <Text style={styles.sectionTitle}>Recent Borrowed Books</Text>
+                    <FlatList
+                        data={borrowedBooks}
+                        keyExtractor={(item) => item.title}
+                        nestedScrollEnabled
+                        scrollEnabled={false}
+                        renderItem={({ item }) => (
+                            <View style={styles.borrowedBook}>
+                                <Text style={styles.title}>{item.title}</Text>
+                                <Text style={styles.returnDate}>Return by {item.returnDate}</Text>
                             </View>
-                            <Image source={item.image} style={styles.bookImage} />
-                        </View>
-                    )}
-                />
-            </View>
-
-            {/* Borrowed Books */}
-            <View style={styles.borrowedBooks}>
-                <Text style={styles.sectionTitle}>Recent Borrowed Books</Text>
-                <FlatList
-                    data={borrowedBooks}
-                    keyExtractor={(item) => item.title}
-                    nestedScrollEnabled
-                    scrollEnabled={false} // Prevent FlatList from scrolling inside ScrollView
-                    renderItem={({ item }) => (
-                        <View style={styles.borrowedBook}>
-                            <Text style={styles.title}>{item.title}</Text>
-                            <Text style={styles.returnDate}>Return by {item.returnDate}</Text>
-                        </View>
-                    )}
-                />
-            </View>
-        </ScrollView>
+                        )}
+                    />
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: "#121212",
+    },
     container: {
         padding: 20,
-        backgroundColor: "#fff",
     },
     greeting: {
         fontSize: 20,
+        color: "#FFFFFF",
     },
     username: {
         fontSize: 20,
         fontWeight: "bold",
-        color: "#000",
+        color: "#B06AB3",
         marginBottom: 5,
     },
     stat: {
         fontSize: 16,
+        color: "#FFFFFF",
         marginTop: 5,
     },
     bold: {
         fontWeight: "bold",
+        color: "#B06AB3",
     },
     recommendedBooks: {
         marginTop: 50,
@@ -100,26 +111,15 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 20,
         fontWeight: "bold",
+        color: "#FFFFFF",
         marginBottom: 10,
     },
     bookCard: {
         flexDirection: "row",
-        backgroundColor: "#fff",
         borderRadius: 15,
-        padding: 10,
+        padding: 15,
         marginVertical: 8,
         alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 3, // For Android shadow
-    },
-    bookImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 10,
-        marginLeft: 5,
     },
     bookInfo: {
         flex: 1,
@@ -128,11 +128,11 @@ const styles = StyleSheet.create({
     bookTitle: {
         fontSize: 16,
         fontWeight: "bold",
-        color: "#000",
+        color: "#FFFFFF",
     },
     bookDescription: {
         fontSize: 14,
-        color: "#555",
+        color: "#E0E0E0",
         marginTop: 4,
     },
     borrowedBooks: {
@@ -141,15 +141,17 @@ const styles = StyleSheet.create({
     borrowedBook: {
         marginTop: 10,
         padding: 10,
+        backgroundColor: "#1E1E1E",
+        borderRadius: 8,
     },
     title: {
         fontSize: 18,
-        color: "#636ae8",
+        color: "#B06AB3",
         fontWeight: "bold",
     },
     returnDate: {
         fontSize: 14,
-        color: "#555",
+        color: "#757575",
         marginTop: 2,
     },
 });

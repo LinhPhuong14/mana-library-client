@@ -21,11 +21,8 @@ export const IMPLEMENTED_SCREENS = {
   Settings: true,
   BookDetail: true,
 
-  // Admin screens
-  // AdminLogin: true,
-
-  // Librarian screens
-  // LibrarianDashboard: true,
+  // Staff screens
+  StaffLogin: true,
 };
 
 /**

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
-import { TabView, TabBar, SceneMap } from "react-native-tab-view"; // Ensure this is installed
+import { SafeAreaView } from "react-native-safe-area-context"; // Import SafeAreaView
+import { TabView, TabBar, SceneMap } from "react-native-tab-view";
 import { useWindowDimensions } from "react-native";
 
 const borrowedBooks = [
@@ -56,41 +57,47 @@ const HistoryScreen = () => {
     });
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>Books History</Text>
-            <TabView
-                navigationState={{ index, routes }}
-                renderScene={renderScene}
-                onIndexChange={setIndex}
-                initialLayout={{ width: layout.width }}
-                renderTabBar={(props) => (
-                    <TabBar
-                        {...props}
-                        indicatorStyle={{ backgroundColor: "blue" }}
-                        style={{ backgroundColor: "white" }}
-                        activeColor="blue"
-                        inactiveColor="gray"
-                    />
-                )}
-            />
-        </View>
+        <SafeAreaView style={styles.safeArea}> {/* Wrap with SafeAreaView */}
+            <View style={styles.container}>
+                <Text style={styles.header}>Books History</Text>
+                <TabView
+                    navigationState={{ index, routes }}
+                    renderScene={renderScene}
+                    onIndexChange={setIndex}
+                    initialLayout={{ width: layout.width }}
+                    renderTabBar={(props) => (
+                        <TabBar
+                            {...props}
+                            indicatorStyle={{ backgroundColor: "#B06AB3" }}
+                            style={styles.tabBar}
+                            activeColor="#B06AB3"
+                            inactiveColor="#757575"
+                        />
+                    )}
+                />
+            </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: "#121212",
+    },
     container: {
         flex: 1,
-        backgroundColor: "#fff",
         paddingTop: 20,
     },
     header: {
         fontSize: 20,
         fontWeight: "bold",
+        color: "#FFFFFF",
         marginBottom: 15,
         marginLeft: 20,
     },
     bookItem: {
-        backgroundColor: "#f9f9f9",
+        backgroundColor: "#1E1E1E",
         padding: 15,
         borderRadius: 8,
         margin: 10,
@@ -98,11 +105,15 @@ const styles = StyleSheet.create({
     bookTitle: {
         fontSize: 16,
         fontWeight: "bold",
+        color: "#FFFFFF",
     },
     bookDate: {
         fontSize: 14,
-        color: "#555",
+        color: "#757575",
         marginTop: 5,
+    },
+    tabBar: {
+        backgroundColor: "#1E1E1E",
     },
 });
 

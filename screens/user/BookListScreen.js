@@ -1,134 +1,60 @@
 import React, { useState } from "react";
 import { View, Text, FlatList, TextInput, StyleSheet, TouchableOpacity } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const books = [
-    {
-        title: "1984",
-        description: "Dystopian novel set in a totalitarian society.",
-    },
-    {
-        title: "To Kill a Mockingbird",
-        description: "A story of racial injustice in the American South.",
-    },
-    {
-        title: "Pride and Prejudice",
-        description: "Classic novel of manners and marriage.",
-    },
-    {
-        "title": "Tây Du Ký",
-        "description": "Tiểu thuyết cổ điển Trung Quốc, gắn liền với hành trình của Đường Tăng và bốn đồ đệ."
-    },
-    {
-        "title": "Nhật ký trong tù",
-        "description": "Tập thơ của Chủ tịch Hồ Chí Minh trong thời gian bị giam cầm."
-    },
-    {
-        "title": "Dế Mèn Phiêu Lưu Ký",
-        "description": "Một tác phẩm thiếu nhi nổi tiếng của nhà văn Tô Hoài về cuộc phiêu lưu của Dế Mèn."
-    },
-    {
-        "title": "Nỗi Buồn Chiến Tranh",
-        "description": "Tiểu thuyết của Bảo Ninh mô tả tâm trạng và hậu quả chiến tranh đối với con người."
-    },
-    {
-        "title": "Chí Phèo",
-        "description": "Tác phẩm của Nam Cao, phê phán xã hội cũ và nỗi đau của nhân vật Chí Phèo."
-    },
-    {
-        "title": "Số Đỏ",
-        "description": "Tiểu thuyết châm biếm xã hội của Vũ Trọng Phụng về cuộc sống thời kỳ Pháp thuộc."
-    },
-    {
-        "title": "Lão Hạc",
-        "description": "Một trong những tác phẩm tiêu biểu của Nam Cao, phản ánh cuộc sống nghèo khổ của người nông dân."
-    },
-    {
-        "title": "Tôi Thấy Hoa Vàng Trên Cỏ Xanh",
-        "description": "Một câu chuyện về tuổi thơ, tình bạn và gia đình của tác giả Nguyễn Nhật Ánh."
-    },
-    {
-        "title": "Cánh Đồng Bất Tận",
-        "description": "Tiểu thuyết của Nguyễn Ngọc Tư về những số phận nghèo khó ở miền Tây Nam Bộ."
-    },
-    {
-        "title": "Mắt Biếc",
-        "description": "Một tác phẩm tình cảm lãng mạn của Nguyễn Nhật Ánh về tình yêu trong sáng và khát khao mãnh liệt."
-    },
-    {
-        "title": "Tâm Hồn Cao Thượng",
-        "description": "Một câu chuyện về tình yêu, lòng nhân ái và sự hy sinh của nhà văn Nguyễn Minh Châu."
-    },
-    {
-        "title": "Bến Không Chồng",
-        "description": "Tác phẩm của nhà văn Dương Hướng, nói về tình yêu và sự khao khát tự do trong cuộc sống."
-    },
-    {
-        "title": "Đoàn Tùy Nghĩa",
-        "description": "Cuốn sách nói về những cuộc chiến tranh và những con người hi sinh trong cuộc đấu tranh giành độc lập."
-    },
-    {
-        "title": "Nghĩa Sĩ Cần Giuộc",
-        "description": "Lịch sử chiến đấu của nghĩa sĩ trong kháng chiến chống Pháp."
-    },
-    {
-        "title": "Mưa Ngâu",
-        "description": "Tiểu thuyết của nhà văn Nguyễn Ngọc Tư, miêu tả cuộc sống của những người phụ nữ miền Tây Nam Bộ."
-    },
-    {
-        "title": "Dòng Sông Cái",
-        "description": "Một tác phẩm của nhà văn Nguyễn Thị Thu Huệ, phản ánh cuộc sống khốn khó ở một làng quê."
-    },
-    {
-        "title": "Con Cái Mất Tích",
-        "description": "Tác phẩm miêu tả những cuộc sống đầy thử thách và gian nan của những gia đình nghèo khó."
-    },
-    {
-        "title": "Đất Rừng Phương Nam",
-        "description": "Tiểu thuyết lịch sử về một vùng đất phương Nam của tác giả Đoàn Giỏi."
-    },
-    {
-        "title": "Phố Vắng Người",
-        "description": "Một câu chuyện về những cuộc sống lặng lẽ trong xã hội hiện đại của tác giả Hoàng Ngọc Tuấn."
-    },
-    {
-        "title": "Đi Bắt Cái Con",
-        "description": "Tiểu thuyết của nhà văn Võ Quảng, kể về những chuyến đi đầy gian nan của một người dân miền biển."
-    }
+const initialBooks = [
+    { title: "1984", description: "Dystopian novel set in a totalitarian society.", borrowed: false },
+    { title: "To Kill a Mockingbird", description: "A story of racial injustice in the American South.", borrowed: false },
+    { title: "Pride and Prejudice", description: "Classic novel of manners and marriage.", borrowed: false },
+    { title: "The Great Gatsby", description: "A critique of the American Dream.", borrowed: false },
+    { title: "Moby Dick", description: "A whaling adventure with deep symbolism.", borrowed: false },
+    { title: "War and Peace", description: "Historical novel set during Napoleon's invasion of Russia.", borrowed: false },
+    { title: "The Catcher in the Rye", description: "A young man's struggles with society.", borrowed: false },
+    { title: "The Hobbit", description: "A fantasy adventure story.", borrowed: false },
+    { title: "Brave New World", description: "A dystopian future controlled by technology and conditioning.", borrowed: false },
+    { title: "Crime and Punishment", description: "A psychological novel about guilt and redemption.", borrowed: false }
 ];
 
 const BookListScreen = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState("");
-    const [filteredBooks, setFilteredBooks] = useState(books);
+    const [books, setBooks] = useState(initialBooks);
+    const [showAll, setShowAll] = useState(false);
 
     const handleSearch = (text) => {
         setSearchQuery(text);
-        if (text === "") {
-            setFilteredBooks(books);
-        } else {
-            const filtered = books.filter((book) =>
-                book.title.toLowerCase().includes(text.toLowerCase())
-            );
-            setFilteredBooks(filtered);
-        }
+    };
+
+    const toggleBorrowStatus = (title) => {
+        setBooks((prevBooks) =>
+            prevBooks.map((book) =>
+                book.title === title ? { ...book, borrowed: !book.borrowed } : book
+            )
+        );
     };
 
     const handleNavigateToBookDetail = (book) => {
-        console.log("Navigating to BookDetailScreen for book:", book.title);
         navigation.navigate("BookDetail", { book });
     };
 
+    const filteredBooks = books.filter((book) =>
+        book.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const displayedBooks = showAll ? filteredBooks : filteredBooks.slice(0, 3);
+
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <TextInput
                 style={styles.searchBar}
                 placeholder="Search books..."
+                placeholderTextColor="#999"
                 value={searchQuery}
                 onChangeText={handleSearch}
             />
 
-            <Text style={styles.sectionTitle}>Recommended books</Text>
             <FlatList
-                data={filteredBooks}
+                data={displayedBooks}
                 keyExtractor={(item) => item.title}
                 renderItem={({ item }) => (
                     <TouchableOpacity
@@ -138,58 +64,74 @@ const BookListScreen = ({ navigation }) => {
                         <View style={styles.bookInfo}>
                             <Text style={styles.bookTitle}>{item.title}</Text>
                             <Text style={styles.bookDescription}>{item.description}</Text>
-                            <TouchableOpacity style={styles.borrowButton}>
-                                <Text style={styles.borrowText}>Borrow</Text>
+                            <TouchableOpacity
+                                style={[styles.borrowButton, item.borrowed && styles.borrowedButton]}
+                                onPress={() => toggleBorrowStatus(item.title)}
+                            >
+                                <Text style={[styles.borrowText, item.borrowed && styles.borrowedText]}>
+                                    {item.borrowed ? "Borrowed" : "Borrow"}
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </TouchableOpacity>
                 )}
             />
 
-            <TouchableOpacity
-                style={styles.showMoreButton}
-                onPress={() => handleNavigateToBookDetail()}
-            >
-                <Text style={styles.showMoreText}>Show more</Text>
-            </TouchableOpacity>
-        </View>
+            {filteredBooks.length > 3 && (
+                <TouchableOpacity
+                    style={styles.showMoreButton}
+                    onPress={() => setShowAll(!showAll)}
+                >
+                    <LinearGradient
+                        colors={["#4568DC", "#B06AB3"]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.gradientButton}
+                    >
+                        <Text style={styles.showMoreText}>{showAll ? "Show Less" : "Show More"}</Text>
+                    </LinearGradient>
+                </TouchableOpacity>
+            )}
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
-        backgroundColor: "#fff",
         flex: 1,
+        backgroundColor: "#121212",
+        alignItems: "center",
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingBottom: 20,
     },
     searchBar: {
-        backgroundColor: "#ddd",
+        backgroundColor: "#1E1E1E",
         padding: 10,
-        borderRadius: 5,
+        borderRadius: 10,
         fontSize: 16,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
-        marginVertical: 15,
+        color: "#fff",
+        width: "100%",
+        marginBottom: 20,
     },
     bookCard: {
-        flexDirection: "row",
-        backgroundColor: "#f9f9f9",
+        backgroundColor: "#1E1E1E",
         borderRadius: 10,
         padding: 15,
+        width: "100%",
         marginBottom: 10,
     },
     bookInfo: {
         flex: 1,
     },
     bookTitle: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: "bold",
+        color: "#FFFFFF",
     },
     bookDescription: {
         fontSize: 14,
-        color: "#555",
+        color: "#AAAAAA",
         marginVertical: 5,
     },
     borrowButton: {
@@ -197,21 +139,33 @@ const styles = StyleSheet.create({
         borderColor: "#6200ea",
         padding: 5,
         borderRadius: 5,
-        width: 70,
+        width: 100,
         alignItems: "center",
+        marginTop: 10,
+    },
+    borrowedButton: {
+        backgroundColor: "#6200ea",
     },
     borrowText: {
         color: "#6200ea",
     },
+    borrowedText: {
+        color: "#FFFFFF",
+    },
     showMoreButton: {
-        backgroundColor: "#eee",
-        padding: 10,
-        borderRadius: 5,
+        width: "100%",
+        marginTop: 20,
+        borderRadius: 30,
+        overflow: "hidden",
+    },
+    gradientButton: {
+        paddingVertical: 15,
         alignItems: "center",
-        marginTop: 10,
     },
     showMoreText: {
-        fontSize: 16,
+        color: "#FFFFFF",
+        fontSize: 18,
+        fontWeight: "bold",
     },
 });
 
