@@ -41,7 +41,6 @@ const LoginScreen = ({ navigation }) => {
 
             </TouchableOpacity>
 
-            {error && <Text style={styles.errorText}>{error}</Text>}
             <View style={styles.buttonContainer}>
                 <Text style={styles}>
                     Don't have an account?{" "}
