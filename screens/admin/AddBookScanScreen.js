@@ -75,6 +75,29 @@ const getBookFromISBN = async (isbn) => {
       language: "Vietnamese",
       publisher: "IPM",
     },
+    9786040230713: {
+      title: "Xác suất thống kê",
+      author: "PGS.TS. Tô Văn Ban",
+      publishedDate: "2020",
+      description: "Chương 1. Biến cố, xác suất biến cố; Chương 2. Biến ngẫu nhiên; Chương 3. Vectơ ngẫu nhiên; Chương 4. Thống kê; Chương 5. Mô hình hồi quy tuyến tính; Chương 6. Bài tập.",
+      pageCount: 319,
+      categories: ["Science", "Mathematics", "University"],
+      imageUrl: "https://hfs1.duytan.edu.vn/upload/sach_anh/87803.jpg",
+      language: "Vietnamese",
+      publisher: "NXB Giáo dục Việt Nam - Hà Nội",
+    },
+    9786046710554: {
+      title: "Cơ sở công nghệ phần mềm",
+      author: "Lương Mạnh Bá",
+      published: "2018",
+      description:
+        "Tài liệu cung cấp những kiến thức cơ bản của lĩnh vực công nghệ phần mềm: các khái niệm, qui trình và các, mô hình chế tác phần mềm theo vòng đời phát triển phần mềm.Đối tượng chính của tài liệu này là sinh viên năm thứ 3 hay năm 4 ngành CNTT. Nó cũng hữu ích cho các kỹ sư muốn hiểu thêm các khái niệm, các qui trình chế tác theo các chuẩn của thế giới. Tài liệu gồm 6 phần với 13 chương. Phần 1 gồm 2 chương trình bày các khái niệm về phần mềm. Phần 2 dành cho tiến trình quản lý việc chế tác phần mềm- quản lý dự án phần mềm. Phần 3 trình bày giai đoạn đầu tiên của quá trình phát triển phần mềm. Phần 4 giới thiệu về quá trình thiết kế hệ thống. Phần 5 đề cập đến giai đoạn cuối cùng của qui trình chế tác phần mềm, kiểm thử và bảo trì. Phần 6 của giáo trình nhằm giới thiệu một số vấn đề cần quan tâm tìm hiểu thêm như: chuẩn ISO về chế tác phần mềm, mô hình và chuẩn CMMI, qui trình phát triển phần mềm hợp nhất -RUP",
+      pageCount: 246,
+      categories: ["Science", "Technology", "University", "Database"],
+      imageUrl: "https://lib.caothang.edu.vn/book_images/25166.jpg",
+      language: "Vietnamese",
+      publisher: "NXB Khoa học kĩ thuật",
+    },
   };
 
   if (mockBooks[isbn]) {
