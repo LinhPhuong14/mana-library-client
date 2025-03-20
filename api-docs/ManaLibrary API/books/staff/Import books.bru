@@ -7,9 +7,13 @@ meta {
 post {
   url: http://localhost:8000/api/v1/books/import
   body: multipartForm
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{staffToken}}
 }
 
 body:multipart-form {
-  booksFile: @file() @contentType(application/json)
+  booksFile: @file(/home/vtvinh24/WS/mana-library/mana-library-server/database/example/books.json) @contentType(application/json)
 }

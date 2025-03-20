@@ -7,11 +7,15 @@ meta {
 patch {
   url: http://localhost:8000/api/v1/users/:userId
   body: json
-  auth: none
+  auth: bearer
 }
 
 params:path {
   userId: 
+}
+
+auth:bearer {
+  token: {{staffToken}}
 }
 
 body:json {

@@ -7,11 +7,15 @@ meta {
 post {
   url: http://localhost:8000/api/v1/books/:bookId/reserve
   body: json
-  auth: none
+  auth: bearer
 }
 
 params:path {
   bookId: 
+}
+
+auth:bearer {
+  token: {{token}}
 }
 
 body:json {

@@ -5,7 +5,6 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
-// Removed: import { Picker } from "@react-native-picker/picker";
 
 // Book categories
 const CATEGORIES = ["Fiction", "Non-Fiction", "Technology", "Science", "History", "Biography", "Self-Help", "Business", "Finance", "Memoir", "Other"];

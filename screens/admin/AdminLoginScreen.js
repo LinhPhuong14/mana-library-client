@@ -59,7 +59,7 @@ const AdminLogin = ({ navigation }) => {
               />
             </Pressable>
             <Text style={styles.title}>Mana Library</Text>
-            <Text style={styles.subtitle}>Staff Portal</Text>
+            <Text style={styles.subtitle}>Partner Portal</Text>
           </View>
 
           <View style={styles.formContainer}>
