@@ -1,53 +1,53 @@
-import React from "react";
+import Reac, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome } from "@expo/vector-icons";
 
-const BookDetailScreen = () => {
+const BookDetailScreen = ({ route }) => {
+    const { book } = route.params;
+    const [isBorrowed, setIsBorrowed] = useState(book.borrowed || false);
+
+    const toggleBorrowStatus = () => {
+        setIsBorrowed((prev) => !prev);
+    };
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>The 48 Laws of Power</Text>
-            <Text style={styles.author}>Robert Greene</Text>
+            <Text style={styles.title}>{book.title}</Text>
+            <Text style={styles.author}>by {book.author}</Text>
 
             <Text style={styles.description}>
-                Amoral, cunning, ruthless, and instructive, "The 48 Laws of Power" has
-                become the bible for those who seek to gain and maintain power. With a
-                perspective drawn from the wisdom of the ages and the perspicacity of
-                the present, Greene reveals the principles behind the strategies of
-                history's greatest figures, from Sun Tzu to Bismarck and beyond. Each
-                law is illustrated with examples from across history and literature, and
-                explained with a clarity that is as compelling as it is shocking.
+                {book.description}
             </Text>
 
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.borrowedButton}>
-                    <LinearGradient
-                        colors={["#4568DC", "#B06AB3"]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.gradientButton}
-                    >
-                        <Text style={styles.buttonText}>Borrowed</Text>
-                    </LinearGradient>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.heartButton}>
-                    <FontAwesome name="heart" size={20} color="#B06AB3" />
-                </TouchableOpacity>
-            </View>
-
-            <View style={styles.returnContainer}>
-                <TouchableOpacity style={styles.returnButton}>
-                    <LinearGradient
-                        colors={["#FF512F", "#DD2476"]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.gradientButton}
-                    >
-                        <Text style={styles.buttonText}>Return</Text>
-                    </LinearGradient>
-                </TouchableOpacity>
-                <Text style={styles.dueDate}>Due: Mar 12, 2025</Text>
+                {isBorrowed ? (
+                    <>
+                        <TouchableOpacity style={[styles.button, styles.borrowedButton]} disabled>
+                            <Text style={[styles.buttonText, styles.borrowedText]}>Borrowed</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.button} onPress={toggleBorrowStatus}>
+                            <LinearGradient
+                                colors={["#DC143C", "#FF6347"]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.gradientButton}
+                            >
+                                <Text style={styles.buttonText}>Return</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </>
+                ) : (
+                    <TouchableOpacity style={styles.button} onPress={toggleBorrowStatus}>
+                        <LinearGradient
+                            colors={["#4568DC", "#B06AB3"]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.gradientButton}
+                        >
+                            <Text style={styles.buttonText}>Borrow</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );
@@ -119,6 +119,37 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         fontSize: 14,
         color: "#757575",
+    },
+    buttonContainer: {
+        marginTop: 20,
+        alignItems: "center",
+    },
+    button: {
+        width: "80%",
+        borderRadius: 30,
+        overflow: "hidden",
+        marginBottom: 10,
+    },
+    gradientButton: {
+        paddingVertical: 12,
+        alignItems: "center",
+    },
+    buttonText: {
+        color: "#FFFFFF",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    borrowedButton: {
+        backgroundColor: "#4568DC",
+        paddingVertical: 12,
+        alignItems: "center",
+        borderRadius: 30,
+        width: "80%",
+    },
+    borrowedText: {
+        color: "#FFFFFF",
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });
 
