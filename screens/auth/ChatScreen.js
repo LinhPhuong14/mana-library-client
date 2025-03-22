@@ -1,6 +1,18 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal } from "react-native";
-
+import React, { useState, useRef } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 // Demo book data
 const DEMO_BOOKS = [
     {
@@ -85,156 +97,228 @@ const DEMO_BOOKS = [
         availableCopies: 5,
     },
 ];
-
 const ChatScreen = () => {
-    const [chatInput, setChatInput] = useState("");
-    const [chatResponse, setChatResponse] = useState("");
-    const [modalVisible, setModalVisible] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const scrollViewRef = useRef();
 
+  const API_KEY = 'AIzaSyBAmflOLvabIlqjl14JzFZNHCFtQLkQ76Y';
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
-    const API_KEY = 'AIzaSyBAmflOLvabIlqjl14JzFZNHCFtQLkQ76Y'; // Thay thế bằng API key thực
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+  const handleChatInput = async () => {
+    if (!chatInput.trim()) return;
+    const userMessage = { sender: "Bạn", text: chatInput };
+    setMessages(prev => [...prev, userMessage]);
+    setChatInput("");
+    setIsLoading(true);
+    setMessages(prev => [...prev, { sender: "AI", text: "Đang xử lý... ⏳" }]);
 
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Giả tưởng bạn là AI Quản lý của Thư viện của tôi và bạn trả lời những gì có trong thư viện với những cuốn sách sau: ${DEMO_BOOKS.map(book => book.title).join(", ")}, Luôn luôn nói chào Tâm khi trả lời. ${chatInput}`
+            }]
+          }]
+        })
+      });
 
-    const handleChatInput = async () => {
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "contents": [{
-                        "parts": [{ "text": "Giả tưởng bạn là AI Quản lý của Thư viện của tôi và bạn trả lời những gì có trong thư viện với những cuốn sách sau: " + DEMO_BOOKS.map(book => book.title).join(", ") + ",Luôn luôn nói chào Tâm khi trả lời" + chatInput }]
-                    }]
-                })
-            });
+      const data = await response.json();
+      const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Không thể lấy câu trả lời.";
+      setMessages(prev => prev.filter(msg => msg.text !== "Đang xử lý... ⏳"));
+      simulateTyping(aiText);
+    } catch (error) {
+      console.error("Lỗi khi gửi yêu cầu:", error);
+      setMessages(prev => [...prev, { sender: "AI", text: "Có lỗi xảy ra khi xử lý yêu cầu." }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-            const data = await response.json();
+  const simulateTyping = (text) => {
+    let index = 0;
+    let currentText = "";
+    const interval = setInterval(() => {
+      if (index < text.length) {
+        currentText += text[index];
+        index++;
+        setMessages(prev => {
+          const lastMessage = prev[prev.length - 1];
+          if (lastMessage?.sender === "AI") {
+            return [...prev.slice(0, -1), { sender: "AI", text: currentText }];
+          } else {
+            return [...prev, { sender: "AI", text: currentText }];
+          }
+        });
+      } else {
+        clearInterval(interval);
+      }
+    }, 5);
+  };
 
-            setChatResponse(`Bạn: ${chatInput}\nAI: ${data.candidates[0].content.parts[0].text}`);
-            setChatInput("");
-            console.log(data.candidates[0].content.parts[0].text);
-        } catch (error) {
-            console.error(`Lỗi khi gửi yêu cầu:`, error);
-        }
-    };
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.chatButton} onPress={() => setModalVisible(true)}>
+        <Ionicons name="chatbubbles" size={28} color="white" />
+      </TouchableOpacity>
 
-    const handleSendMessage = () => {
-        // Simulate a response
-        setChatResponse(`AI: You said '${chatInput}'`);
-        setChatInput("");
-    };
-
-    const toggleModal = () => {
-        setModalVisible(!isModalVisible);
-    };
-    return (
-        <View style={styles.container}>
-            {/* Floating Chat Button */}
-            <TouchableOpacity style={styles.chatButton} onPress={() => setModalVisible(true)}>
-                <Text style={styles.chatButtonText}>💬</Text>
-            </TouchableOpacity>
-
-            {/* Chat Modal */}
-            <Modal animationType="slide" transparent={true} visible={modalVisible}>
-                <View style={styles.modalContainer}>
-                    <View style={styles.chatBox}>
-                        <ScrollView style={styles.chatMessagesContainer}>
-                            <Text style={styles.chatResponse}>{chatResponse}</Text>
-                        </ScrollView>
-
-                        <View style={styles.chatInputContainer}>
-                            <TextInput
-                                style={styles.chatInput}
-                                placeholder="Nhập câu hỏi..."
-                                value={chatInput}
-                                onChangeText={setChatInput}
-                            />
-                            <TouchableOpacity onPress={handleChatInput} style={styles.sendButton}>
-                                <Text style={styles.sendButtonText}>Gửi</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-                            <Text style={styles.closeButtonText}>Đóng</Text>
-                        </TouchableOpacity>
-                    </View>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View style={styles.modalContainer}>
+          <KeyboardAvoidingView
+            style={styles.chatBox}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <ScrollView
+              ref={scrollViewRef}
+              onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+              style={styles.chatMessagesContainer}
+            >
+              {messages.map((msg, index) => (
+                <View key={index} style={styles.messageBlock}>
+                  <Text style={styles.messageText}>
+                    <Text style={styles.sender}>{msg.sender}: </Text>
+                    {msg.text}
+                  </Text>
+                  {msg.sender === "AI" && /xem ngay|gợi ý|xem sách/i.test(msg.text) && (
+                    <TouchableOpacity
+                      style={styles.suggestionButton}
+                      onPress={() => alert("Chức năng Xem sách đang phát triển 📚")}
+                    >
+                      <Text style={styles.suggestionButtonText}>Xem ngay</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
-            </Modal>
+              ))}
+            </ScrollView>
+
+            <View style={styles.chatInputContainer}>
+              <TextInput
+                style={styles.chatInput}
+                placeholder="Nhập câu hỏi..."
+                placeholderTextColor="#aaa"
+                value={chatInput}
+                onChangeText={setChatInput}
+              />
+              <TouchableOpacity onPress={handleChatInput} disabled={isLoading} style={styles.sendButtonContainer}>
+                <LinearGradient
+                  colors={["#4568DC", "#B06AB3"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.sendButton}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Text style={styles.sendButtonText}>Gửi</Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Đóng</Text>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
         </View>
-    );
+      </Modal>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    chatButton: {
-        position: "absolute",
-        bottom: 20,
-        left: 20,
-        backgroundColor: "#6970e4",
-        padding: 15,
-        borderRadius: 30,
-        elevation: 5,
-        zIndex: 9999,
-    },
-    chatButtonText: {
-        color: "white",
-        fontSize: 20,
-        textAlign: "center",
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-    },
-    chatBox: {
-        width: "90%",
-        height: "80%",
-        backgroundColor: "white",
-        padding: 20,
-        borderRadius: 10,
-    },
-    chatMessagesContainer: {
-        height: 200,
-        marginBottom: 10,
-    },
-    chatResponse: {
-        fontSize: 16,
-        padding: 10,
-    },
-    chatInputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-    },
-    chatInput: {
-        flex: 1,
-        padding: 10,
-        borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 5,
-        backgroundColor: "#f5f5f5",
-    },
-    sendButton: {
-        backgroundColor: "#6970e4",
-        padding: 10,
-        marginLeft: 10,
-        borderRadius: 5,
-    },
-    sendButtonText: {
-        color: "white",
-    },
-    closeButton: {
-        marginTop: 10,
-        alignItems: "center",
-    },
-    closeButtonText: {
-        color: "red",
-        fontSize: 16,
-    },
+  container: { flex: 1 },
+  chatButton: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    backgroundColor: "#6970e4",
+    padding: 16,
+    borderRadius: 50,
+    elevation: 5,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#121212",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  chatBox: {
+    width: "90%",
+    height: "85%",
+    backgroundColor: "#1E1E1E",
+    borderRadius: 16,
+    padding: 20,
+    justifyContent: "space-between",
+  },
+  chatMessagesContainer: {
+    flex: 1,
+    marginBottom: 10,
+  },
+  messageBlock: {
+    marginBottom: 12,
+  },
+  messageText: {
+    color: "#f0f0f0",
+    fontSize: 16,
+  },
+  sender: {
+    fontWeight: "bold",
+    color: "#8A2BE2",
+  },
+  chatInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  chatInput: {
+    flex: 1,
+    padding: 12,
+    fontSize: 16,
+    color: "white",
+    borderWidth: 1,
+    borderColor: "#333",
+    borderRadius: 8,
+    marginRight: 10,
+    backgroundColor: "#2C2C2C",
+  },
+  sendButtonContainer: {
+    borderRadius: 30,
+    overflow: "hidden",
+  },
+  sendButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sendButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  closeButton: {
+    marginTop: 12,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "#ff5c5c",
+    fontSize: 16,
+  },
+  suggestionButton: {
+    marginTop: 6,
+    backgroundColor: "#ffb347",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    alignSelf: "flex-start",
+  },
+  suggestionButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
 });
 
 export default ChatScreen;
