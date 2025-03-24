@@ -1,0 +1,68 @@
+{
+  "users": [
+    {
+      "id": "user1",
+      "name": "Library Admin",
+      "email": "admin@example.com",
+      "role": "admin",
+      "phone": "123-456-7890",
+      "contactPreference": "email"
+    },
+    {
+      "id": "user2",
+      "name": "Book Collector",
+      "email": "collector@example.com",
+      "role": "partner",
+      "phone": "234-567-8901",
+      "messengerId": "collector123",
+      "contactPreference": "messenger"
+    },
+    {
+      "id": "user3",
+      "name": "Regular Reader",
+      "email": "reader@example.com",
+      "role": "user",
+      "phone": "345-678-9012"
+    },
+    {
+      "id": "user4",
+      "name": "Sarah Johnson",
+      "email": "sarah.j@example.com",
+      "role": "user",
+      "phone": "456-789-0123",
+      "contactPreference": "phone"
+    },
+    {
+      "id": "user5",
+      "name": "Michael Chen",
+      "email": "m.chen@example.com",
+      "role": "partner",
+      "phone": "567-890-1234",
+      "messengerId": "mikechen",
+      "contactPreference": "email"
+    },
+    {
+      "id": "user6",
+      "name": "Emily Rodriguez",
+      "email": "e.rodriguez@example.com",
+      "role": "admin",
+      "phone": "678-901-2345",
+      "contactPreference": "email"
+    },
+    {
+      "id": "user7",
+      "name": "David Kim",
+      "email": "david.k@example.com",
+      "role": "user",
+      "phone": "789-012-3456"
+    },
+    {
+      "id": "user8",
+      "name": "Olivia Wilson",
+      "email": "o.wilson@example.com",
+      "role": "user",
+      "phone": "890-123-4567",
+      "contactPreference": "email"
+    }
+  ]
+}

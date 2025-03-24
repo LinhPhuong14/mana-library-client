@@ -1,4 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import usersData from "./data/users.json";
+import librariesData from "./data/libraries.json";
+import booksData from "./data/books.json";
+import transactionsData from "./data/transactions.json";
+import demoData from "./data/demo.json";
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -6,29 +11,34 @@ const STORAGE_KEYS = {
   BOOKS: "mana_books",
   USERS: "mana_users",
   TRANSACTIONS: "mana_transactions",
+  // demo data
+  DEMO: "demo_data",
+  // special key for the current user
   CURRENT_USER: "mana_current_user",
 };
 
-// Initialize with demo data if empty
-export const initializeStorage = async () => {
-  const libraries = await AsyncStorage.getItem(STORAGE_KEYS.LIBRARIES);
-  const books = await AsyncStorage.getItem(STORAGE_KEYS.BOOKS);
-  const users = await AsyncStorage.getItem(STORAGE_KEYS.USERS);
+export const initializeDemoData = async () => {
+  try {
+    // Check if data already exists by checking users
+    const existingUsers = await AsyncStorage.getItem("mana_users");
 
-  if (!libraries) {
-    await AsyncStorage.setItem(STORAGE_KEYS.LIBRARIES, JSON.stringify(DEMO_LIBRARIES));
-  }
+    if (existingUsers === null) {
+      // Initialize all data since it doesn't exist
+      await AsyncStorage.setItem("mana_users", JSON.stringify(usersData.users));
+      await AsyncStorage.setItem("mana_libraries", JSON.stringify(librariesData.libraries));
+      await AsyncStorage.setItem("mana_books", JSON.stringify(booksData.books));
+      await AsyncStorage.setItem("mana_transactions", JSON.stringify(transactionsData.transactions));
+      await AsyncStorage.setItem("demo_data", JSON.stringify(demoData));
 
-  if (!books) {
-    await AsyncStorage.setItem(STORAGE_KEYS.BOOKS, JSON.stringify(DEMO_BOOKS));
-  }
-
-  if (!users) {
-    await AsyncStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(DEMO_USERS));
-  }
-
-  if (!(await AsyncStorage.getItem(STORAGE_KEYS.TRANSACTIONS))) {
-    await AsyncStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify([]));
+      console.log("Demo data initialized successfully");
+      return true;
+    } else {
+      console.log("Data already exists, skipping initialization");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error initializing demo data:", error);
+    return false;
   }
 };
 
@@ -69,92 +79,8 @@ export const addBook = async (book) => {
   return books;
 };
 
-// More CRUD operations for users, transactions, borrowing logic...
-
-// Sample demo data
-const DEMO_LIBRARIES = [
-  {
-    id: "lib1",
-    name: "Community Library",
-    owner: "user1",
-    description: "A collection of books for everyone",
-    isPublic: true,
-    location: "123 Main Street",
-    contact: "library@example.com",
-  },
-  {
-    id: "lib2",
-    name: "Science Fiction Collection",
-    owner: "user2",
-    description: "Sci-fi books for enthusiasts",
-    isPublic: true,
-    location: "456 Park Avenue",
-    contact: "scifi@example.com",
-  },
-];
-
-const DEMO_BOOKS = [
-  {
-    id: "book1",
-    libraryId: "lib1",
-    title: "Atomic Habits",
-    author: "James Clear",
-    isbn: "9781847941831",
-    description: "Tiny Changes, Remarkable Results",
-    copies: [
-      {
-        id: 1,
-        borrowedBy: "user3",
-        borrowDate: new Date(2025, 2, 10).toISOString(),
-        dueDate: new Date(2025, 2, 24).toISOString(),
-      },
-      {
-        id: 2,
-        borrowedBy: null,
-      },
-    ],
-    reservedBy: ["user4", "user5"],
-  },
-  {
-    id: "book2",
-    libraryId: "lib1",
-    title: "The Psychology of Money",
-    author: "Morgan Housel",
-    isbn: "9780857197689",
-    description: "Timeless lessons on wealth, greed, and happiness",
-    copies: [
-      {
-        id: 1,
-        borrowedBy: null,
-      },
-    ],
-    reservedBy: [],
-  },
-];
-
-const DEMO_USERS = [
-  {
-    id: "user1",
-    name: "Library Admin",
-    email: "admin@example.com",
-    role: "admin",
-  },
-  {
-    id: "user2",
-    name: "Book Collector",
-    email: "collector@example.com",
-    role: "partner",
-  },
-  {
-    id: "user3",
-    name: "Regular Reader",
-    email: "reader@example.com",
-    role: "user",
-  },
-];
-
 export default {
-  initializeStorage,
+  initializeDemoData,
   getLibraries,
   addLibrary,
   getBooks,
