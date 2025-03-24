@@ -10,6 +10,7 @@ const BookDetailScreen = importScreen("../screens/user/BookDetailScreen", "Book 
 const NotificationsScreen = importScreen("../screens/user/NotificationsScreen", "Notifications");
 const SearchResultsScreen = importScreen("../screens/user/SearchResultsScreen", "Search Results");
 const EditProfileScreen = importScreen("../screens/user/EditProfileScreen", "Edit Profile");
+import LibraryDetailScreen from "../screens/partner/LibraryDetail";
 
 const UserNavigator = () => {
   return (
@@ -35,6 +36,13 @@ const UserNavigator = () => {
         name="EditProfile"
         component={safeScreen(EditProfileScreen, "Edit Profile")}
         options={{ headerShown: true, title: "Edit Profile" }}
+      />
+
+      {/* Library details screen */}
+      <UserStack.Screen
+        name="LibraryDetails"
+        component={LibraryDetailScreen}
+        options={{ title: "Library Details" }}
       />
     </UserStack.Navigator>
   );

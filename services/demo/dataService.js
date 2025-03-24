@@ -69,6 +69,7 @@ export const addBook = async (book) => {
   return books;
 };
 
+
 // More CRUD operations for users, transactions, borrowing logic...
 
 // Sample demo data
@@ -160,4 +161,6 @@ export default {
   getBooks,
   addBook,
   STORAGE_KEYS,
+  DEMO_BOOKS,
+  DEMO_LIBRARIES
 };

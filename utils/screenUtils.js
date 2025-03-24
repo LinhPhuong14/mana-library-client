@@ -15,6 +15,7 @@ export const IMPLEMENTED_SCREENS = {
   Chat: true,
   // User screens
   Home: true,
+  Discovery: true,
   BooksList: true,
   Profile: true,
   History: true,

@@ -1,28 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Alert, Modal } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { Camera } from "expo-camera";
+import { LinearGradient } from "expo-linear-gradient";
 import storageService from "../../services/demo/dataService";
 
 const DiscoveryScreen = ({ navigation }) => {
   const [libraries, setLibraries] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredLibraries, setFilteredLibraries] = useState([]);
+  const { initializeStorage, getLibraries } = storageService;
+
+  const [cameraPermission, setCameraPermission] = useState(null);
+  const [isScannerVisible, setScannerVisible] = useState(false);
 
   useEffect(() => {
     loadLibraries();
+    requestCameraPermission();
   }, []);
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
       setFilteredLibraries(libraries);
     } else {
-      const filtered = libraries.filter((lib) => lib.name.toLowerCase().includes(searchQuery.toLowerCase()) || lib.description.toLowerCase().includes(searchQuery.toLowerCase()));
+      const filtered = libraries.filter((lib) =>
+        lib.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        lib.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
       setFilteredLibraries(filtered);
     }
   }, [searchQuery, libraries]);
 
   const loadLibraries = async () => {
     try {
+      await initializeStorage();
       const data = await storageService.getLibraries();
       setLibraries(data);
       setFilteredLibraries(data);
@@ -31,50 +43,44 @@ const DiscoveryScreen = ({ navigation }) => {
     }
   };
 
-  const renderLibraryItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.libraryItem}
-      onPress={() => navigation.navigate("LibraryDetails", { libraryId: item.id })}
-    >
-      <View style={styles.libraryContent}>
-        <Text style={styles.libraryName}>{item.name}</Text>
-        <Text style={styles.libraryDescription}>{item.description}</Text>
-        <Text style={styles.libraryMeta}>
-          {item.isPublic ? "Public" : "Private"} • {item.location}
-        </Text>
-      </View>
-      <Ionicons
-        name="chevron-forward"
-        size={24}
-        color="#666"
-      />
-    </TouchableOpacity>
-  );
+  const requestCameraPermission = async () => {
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    setCameraPermission(status === "granted");
+    if (status !== "granted") {
+      Alert.alert("Permission Denied", "Camera permission is required to scan QR codes.");
+    }
+  };
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScannerVisible(false);
+    Alert.alert("QR Code Scanned", `Type: ${type}\nData: ${data}`);
+    // You can add custom logic here for processing the scanned data
+  };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Discover Libraries</Text>
-
         <View style={styles.searchContainer}>
-          <Ionicons
-            name="search"
-            size={20}
-            color="#666"
-            style={styles.searchIcon}
-          />
+          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search libraries..."
+            placeholderTextColor="#AAA"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-          <TouchableOpacity style={styles.scanButton}>
-            <Ionicons
-              name="qr-code"
-              size={24}
-              color="#fff"
-            />
+          <TouchableOpacity
+            style={styles.scanButton}
+            onPress={() => {
+              if (cameraPermission) {
+                setScannerVisible(true);
+              } else {
+                requestCameraPermission();
+              }
+            }}
+          >
+            <Ionicons name="qr-code" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -82,7 +88,26 @@ const DiscoveryScreen = ({ navigation }) => {
       <FlatList
         data={filteredLibraries}
         keyExtractor={(item) => item.id}
-        renderItem={renderLibraryItem}
+        renderItem={({ item }) => (
+          <LinearGradient
+            colors={["#4568DC", "#B06AB3"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.libraryItem}
+          >
+            <TouchableOpacity
+              style={styles.libraryContent}
+              onPress={() => navigation.navigate("LibraryDetails", { libraryId: item.id })}
+            >
+              <Text style={styles.libraryName}>{item.name}</Text>
+              <Text style={styles.libraryDescription}>{item.description}</Text>
+              <Text style={styles.libraryMeta}>
+                {item.isPublic ? "Public" : "Private"} • {item.location}
+              </Text>
+            </TouchableOpacity>
+            <Ionicons name="chevron-forward" size={24} color="#fff" />
+          </LinearGradient>
+        )}
         contentContainerStyle={styles.listContainer}
       />
 
@@ -90,58 +115,79 @@ const DiscoveryScreen = ({ navigation }) => {
         style={styles.createButton}
         onPress={() => navigation.navigate("AddLibrary")}
       >
-        <Text style={styles.createButtonText}>Wanna lend some books? Click here</Text>
+        <LinearGradient
+          colors={["#4568DC", "#B06AB3"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.createButtonGradient}
+        >
+          <Text style={styles.createButtonText}>Lend Some Books</Text>
+        </LinearGradient>
       </TouchableOpacity>
-    </View>
+
+      <Modal visible={isScannerVisible} animationType="slide">
+        <Camera
+          style={StyleSheet.absoluteFillObject}
+          onBarCodeScanned={handleBarCodeScanned}
+        />
+        <TouchableOpacity
+          style={styles.closeScannerButton}
+          onPress={() => setScannerVisible(false)}
+        >
+          <Text style={styles.closeScannerButtonText}>Close Scanner</Text>
+        </TouchableOpacity>
+      </Modal>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#121212",
+    paddingHorizontal: 20,
   },
   header: {
-    padding: 16,
-    backgroundColor: "#fff",
+    marginTop: 20,
+    marginBottom: 10,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
+    color: "#FFFFFF",
     marginBottom: 16,
+    textAlign: "center",
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    padding: 4,
+    backgroundColor: "#1E1E1E",
+    borderRadius: 10,
+    padding: 10,
   },
   searchIcon: {
-    marginHorizontal: 8,
+    marginRight: 8,
   },
   searchInput: {
     flex: 1,
-    height: 40,
-    paddingHorizontal: 8,
+    color: "#FFF",
+    fontSize: 16,
   },
   scanButton: {
-    backgroundColor: "#4a6fa5",
-    borderRadius: 8,
+    backgroundColor: "#8A2BE2",
+    borderRadius: 10,
     padding: 8,
-    marginLeft: 8,
   },
   listContainer: {
-    padding: 16,
+    marginTop: 10,
+    paddingBottom: 20,
   },
   libraryItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 2,
+    borderRadius: 10,
+    padding: 15,
+    marginVertical: 10,
   },
   libraryContent: {
     flex: 1,
@@ -149,26 +195,43 @@ const styles = StyleSheet.create({
   libraryName: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 4,
+    color: "#FFFFFF",
   },
   libraryDescription: {
     fontSize: 14,
-    color: "#666",
-    marginBottom: 8,
+    color: "#E0E0E0",
+    marginVertical: 5,
   },
   libraryMeta: {
     fontSize: 12,
-    color: "#999",
+    color: "#BBBBBB",
   },
   createButton: {
-    margin: 16,
-    padding: 16,
-    backgroundColor: "#4a6fa5",
-    borderRadius: 8,
+    alignSelf: "center",
+    marginVertical: 20,
+    width: "80%",
+    borderRadius: 20,
+  },
+  createButtonGradient: {
+    paddingVertical: 15,
     alignItems: "center",
+    borderRadius: 20,
   },
   createButtonText: {
-    color: "#fff",
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  closeScannerButton: {
+    position: "absolute",
+    bottom: 50,
+    alignSelf: "center",
+    backgroundColor: "#8A2BE2",
+    padding: 12,
+    borderRadius: 8,
+  },
+  closeScannerButtonText: {
+    color: "#FFFFFF",
     fontWeight: "bold",
   },
 });

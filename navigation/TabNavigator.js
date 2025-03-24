@@ -19,6 +19,12 @@ import ProfileScreen from "../screens/user/ProfileScreen";
 import BookDetailScreen from "../screens/user/BookDetailScreen";
 import HistoryScreen from "../screens/user/HistoryScreen";
 import SettingsScreen from "../screens/user/SettingsScreen";
+import DiscoveryScreen from "../screens/user/DiscoveryScreen";
+
+const MyLibraryScreen = importScreen("MyLibraryScreen");
+const PaymentScreen = importScreen("PaymentScreen");
+const AssistantScreen = importScreen("AssistantScreen");
+
 const HomeStackScreen = () => (
   <HomeStack.Navigator>
     <HomeStack.Screen
@@ -81,14 +87,15 @@ const TabNavigator = () => {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
-          if (route.name === "HomeTab") {
-            iconName = "home";
-          } else if (route.name === "BooksTab") {
-            iconName = "library-books";
-          } else if (route.name === "ProfileTab") {
-            iconName = "person";
-          } else if (route.name === "HistoryTab") {
-            iconName = "history";
+
+          if (route.name === "DiscoveryTab") {
+            iconName = "search";
+          } else if (route.name === "MyLibraryTab") {
+            iconName = "book";
+          } else if (route.name === "PaymentTab") {
+            iconName = "credit-card";
+          } else if (route.name === "AssistantTab") {
+            iconName = "chat";
           } else if (route.name === "SettingsTab") {
             iconName = "settings";
           }
@@ -107,24 +114,24 @@ const TabNavigator = () => {
       })}
     >
       <Tab.Screen
-        name="HomeTab"
-        component={HomeStackScreen}
-        options={{ tabBarLabel: "Home" }}
+        name="DiscoveryTab"
+        component={DiscoveryScreen}
+        options={{ tabBarLabel: "Discovery" }}
       />
       <Tab.Screen
-        name="BooksTab"
+        name="MyLibraryTab"
         component={BooksStackScreen}
-        options={{ tabBarLabel: "Books" }}
+        options={{ tabBarLabel: "My Library" }}
       />
       <Tab.Screen
-        name="ProfileTab"
+        name="PaymentTab"
         component={ProfileStackScreen}
-        options={{ tabBarLabel: "Profile" }}
+        options={{ tabBarLabel: "Payment" }}
       />
       <Tab.Screen
-        name="HistoryTab"
+        name="AssistantTab"
         component={HistoryStackScreen}
-        options={{ tabBarLabel: "History" }}
+        options={{ tabBarLabel: "Assistant" }}
       />
       <Tab.Screen
         name="SettingsTab"
