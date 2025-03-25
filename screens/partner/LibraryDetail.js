@@ -38,19 +38,15 @@ const LibraryDetailScreen = () => {
                         nestedScrollEnabled
                         scrollEnabled={false}
                         renderItem={({ item }) => (
-                            <LinearGradient
-                                colors={["#4568DC", "#B06AB3"]}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={styles.bookCard}
-                            >
+                            <View style={styles.bookCard}>
                                 <View style={styles.bookInfo}>
                                     <Text style={styles.bookTitle}>{item.title}</Text>
                                     <Text style={styles.bookAuthor}>by {item.author}</Text>
                                 </View>
-                            </LinearGradient>
+                            </View>
                         )}
                     />
+
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -91,25 +87,24 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     bookCard: {
-        flexDirection: "row",
-        borderRadius: 15,
+        backgroundColor: "#1E1E1E",
+        borderRadius: 10,
         padding: 15,
-        marginVertical: 8,
-        alignItems: "center",
+        width: "100%",
+        marginBottom: 10,
     },
     bookInfo: {
         flex: 1,
-        marginLeft: 5,
     },
     bookTitle: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: "bold",
         color: "#FFFFFF",
     },
     bookAuthor: {
         fontSize: 14,
-        color: "#E0E0E0",
-        marginTop: 4,
+        color: "#AAAAAA",
+        marginVertical: 5,
     },
 });
 

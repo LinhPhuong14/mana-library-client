@@ -17,7 +17,6 @@ const DiscoveryScreen = ({ navigation }) => {
 
   useEffect(() => {
     loadLibraries();
-    requestCameraPermission();
   }, []);
 
   useEffect(() => {
@@ -43,20 +42,6 @@ const DiscoveryScreen = ({ navigation }) => {
     }
   };
 
-  const requestCameraPermission = async () => {
-    const { status } = await Camera.requestCameraPermissionsAsync();
-    setCameraPermission(status === "granted");
-    if (status !== "granted") {
-      Alert.alert("Permission Denied", "Camera permission is required to scan QR codes.");
-    }
-  };
-
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScannerVisible(false);
-    Alert.alert("QR Code Scanned", `Type: ${type}\nData: ${data}`);
-    // You can add custom logic here for processing the scanned data
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -73,10 +58,8 @@ const DiscoveryScreen = ({ navigation }) => {
           <TouchableOpacity
             style={styles.scanButton}
             onPress={() => {
-              if (cameraPermission) {
+              if (cameraPermission === "granted") {
                 setScannerVisible(true);
-              } else {
-                requestCameraPermission();
               }
             }}
           >
@@ -105,7 +88,9 @@ const DiscoveryScreen = ({ navigation }) => {
                 {item.isPublic ? "Public" : "Private"} • {item.location}
               </Text>
             </TouchableOpacity>
-            <Ionicons name="chevron-forward" size={24} color="#fff" />
+            <TouchableOpacity onPress={() => navigation.navigate("LibraryDetails", { libraryId: item.id })}>
+              <Ionicons name="chevron-forward" size={24} color="#fff" />
+            </TouchableOpacity>
           </LinearGradient>
         )}
         contentContainerStyle={styles.listContainer}
@@ -124,19 +109,6 @@ const DiscoveryScreen = ({ navigation }) => {
           <Text style={styles.createButtonText}>Lend Some Books</Text>
         </LinearGradient>
       </TouchableOpacity>
-
-      <Modal visible={isScannerVisible} animationType="slide">
-        <Camera
-          style={StyleSheet.absoluteFillObject}
-          onBarCodeScanned={handleBarCodeScanned}
-        />
-        <TouchableOpacity
-          style={styles.closeScannerButton}
-          onPress={() => setScannerVisible(false)}
-        >
-          <Text style={styles.closeScannerButtonText}>Close Scanner</Text>
-        </TouchableOpacity>
-      </Modal>
     </SafeAreaView>
   );
 };
