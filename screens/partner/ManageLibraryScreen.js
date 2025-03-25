@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert, Modal, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Switch } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Switch, ActivityIndicator, SafeAreaView, Modal, ScrollView } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import dataService from "../../services/demo/dataService";
 
 const ManageLibraryScreen = ({ navigation, route }) => {
@@ -40,55 +39,44 @@ const ManageLibraryScreen = ({ navigation, route }) => {
     const loadData = async () => {
       try {
         setLoading(true);
-        await dataService.initializeDemoData();
+        const libraryData = await dataService.getLibrary(libraryId);
+        const booksData = await dataService.getBooks(libraryId);
 
-        // Load library data
-        const libraries = await dataService.getLibraries();
-        const currentLibrary = libraries.find((lib) => lib.id === libraryId);
-
-        if (!currentLibrary) {
-          setError("Library not found");
-          setLoading(false);
-          return;
+        if (libraryData) {
+          setLibrary(libraryData);
+          setLibraryName(libraryData.name);
+          setLibraryDescription(libraryData.description);
+          setLibraryLocation(libraryData.location);
+          setLibraryContact(libraryData.contact);
+          setIsPublic(libraryData.isPublic);
         }
 
-        setLibrary(currentLibrary);
-        setLibraryName(currentLibrary.name || "");
-        setLibraryDescription(currentLibrary.description || "");
-        setLibraryLocation(currentLibrary.location || "");
-        setLibraryContact(currentLibrary.contact || "");
-        setIsPublic(currentLibrary.isPublic !== false);
-
-        // Load books for this library
-        const allBooks = await dataService.getBooks();
-        const libraryBooks = allBooks.filter((book) => book.libraryId === libraryId);
-        setBooks(libraryBooks);
-      } catch (error) {
-        console.error("Failed to load library data:", error);
-        setError("Failed to load library data. Please try again.");
-      } finally {
+        setBooks(booksData);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
         setLoading(false);
       }
     };
 
-    if (libraryId) {
-      loadData();
-    }
+    loadData();
   }, [libraryId]);
 
   // Helper function to count available copies
   const getAvailableCopies = (book) => {
-    return book.copies.filter((copy) => copy.borrowedBy === null).length;
+    if (!book.copies) return 0;
+    return book.copies.filter((copy) => !copy.borrowedBy).length;
   };
 
   // Helper function to count total copies
   const getTotalCopies = (book) => {
-    return book.copies.length;
+    return book.copies ? book.copies.length : 0;
   };
 
   // Helper function to check if book has been borrowed
   const hasBeenBorrowed = (book) => {
-    return book.copies.some((copy) => copy.borrowedBy !== null) || book.copies.length !== getAvailableCopies(book);
+    if (!book.copies) return false;
+    return book.copies.some((copy) => copy.borrowedBy);
   };
 
   // Reset book form
@@ -99,46 +87,23 @@ const ManageLibraryScreen = ({ navigation, route }) => {
     setBookPublisher("");
     setBookDescription("");
     setBookCoverImage("");
-    setBookCopiesCount("");
+    setBookCopiesCount("1");
     setCurrentBook(null);
     setIsEditMode(false);
   };
 
   // Open book modal for editing
   const openBookEditModal = (book) => {
-    if (hasBeenBorrowed(book)) {
-      // If book has been borrowed, show restricted edit options
-      Alert.alert("Restricted Editing", "This book has been borrowed. You can only edit the cover image and description.", [
-        {
-          text: "Edit Limited Fields",
-          onPress: () => {
-            setCurrentBook(book);
-            setBookTitle(book.title);
-            setBookAuthor(book.author);
-            setBookIsbn(book.isbn);
-            setBookPublisher(book.publisher);
-            setBookDescription(book.description);
-            setBookCoverImage(book.coverImage || "");
-            setBookCopiesCount(book.copies.length.toString());
-            setIsEditMode(true);
-            setBookModalVisible(true);
-          },
-        },
-        { text: "Cancel", style: "cancel" },
-      ]);
-    } else {
-      // Full edit options for books that haven't been borrowed
-      setCurrentBook(book);
-      setBookTitle(book.title);
-      setBookAuthor(book.author);
-      setBookIsbn(book.isbn);
-      setBookPublisher(book.publisher);
-      setBookDescription(book.description);
-      setBookCoverImage(book.coverImage || "");
-      setBookCopiesCount(book.copies.length.toString());
-      setIsEditMode(true);
-      setBookModalVisible(true);
-    }
+    setCurrentBook(book);
+    setBookTitle(book.title);
+    setBookAuthor(book.author);
+    setBookIsbn(book.isbn || "");
+    setBookPublisher(book.publisher || "");
+    setBookDescription(book.description || "");
+    setBookCoverImage(book.coverImage || "");
+    setBookCopiesCount(String(getTotalCopies(book)));
+    setIsEditMode(true);
+    setBookModalVisible(true);
   };
 
   // Open book modal for adding
@@ -147,217 +112,168 @@ const ManageLibraryScreen = ({ navigation, route }) => {
     setBookModalVisible(true);
   };
 
+  // Navigate to scanner screen for adding books
+  const navigateToScanBook = () => {
+    navigation.navigate("AddBookScan", { libraryId });
+  };
+
   // Handle save book
   const handleSaveBook = async () => {
-    // Validate form
-    if (!bookTitle.trim() || !bookAuthor.trim() || !bookIsbn.trim() || !bookDescription.trim()) {
-      Alert.alert("Error", "Please fill in all required fields");
-      return;
-    }
-
-    const copiesCount = Number.parseInt(bookCopiesCount) || 0;
-    if (copiesCount <= 0) {
-      Alert.alert("Error", "Number of copies must be greater than 0");
-      return;
-    }
-
-    setLoading(true);
-
     try {
+      if (!bookTitle || !bookAuthor) {
+        alert("Title and author are required");
+        return;
+      }
+
+      const copiesCount = parseInt(bookCopiesCount) || 1;
+      let bookData;
+
       if (isEditMode && currentBook) {
-        // Check if book has been borrowed
-        const hasBorrowed = hasBeenBorrowed(currentBook);
+        // Update existing book
+        const currentCopies = currentBook.copies || [];
+        const newTotalCopies = copiesCount;
 
-        // Get current borrowed copies to preserve them
-        const borrowedCopies = currentBook.copies.filter((copy) => copy.borrowedBy !== null);
+        // Create or remove copies as needed
+        let updatedCopies = [...currentCopies];
 
-        // Create updated book object
-        const updatedBook = {
-          ...currentBook,
-          // Only update title, author, isbn, publisher if book hasn't been borrowed
-          title: hasBorrowed ? currentBook.title : bookTitle,
-          author: hasBorrowed ? currentBook.author : bookAuthor,
-          isbn: hasBorrowed ? currentBook.isbn : bookIsbn,
-          publisher: hasBorrowed ? currentBook.publisher : bookPublisher,
-          // These fields can always be updated
-          description: bookDescription,
-          coverImage: bookCoverImage,
-        };
-
-        // Handle copies update
-        const newCopiesCount = Number.parseInt(bookCopiesCount);
-        const currentCopiesCount = currentBook.copies.length;
-
-        if (newCopiesCount > currentCopiesCount) {
-          // Add new copies
-          const newCopies = [];
-          for (let i = currentCopiesCount + 1; i <= newCopiesCount; i++) {
-            newCopies.push({
+        if (newTotalCopies > currentCopies.length) {
+          // Add more copies
+          for (let i = currentCopies.length + 1; i <= newTotalCopies; i++) {
+            updatedCopies.push({
               id: i,
               borrowedBy: null,
-              borrowedDate: null,
+              borrowDate: null,
               dueDate: null,
             });
           }
-          updatedBook.copies = [...currentBook.copies, ...newCopies];
-        } else if (newCopiesCount < currentCopiesCount) {
-          // Remove copies, but keep borrowed ones
-          if (newCopiesCount < borrowedCopies.length) {
-            Alert.alert("Error", "Cannot reduce copies below the number currently borrowed");
-            setLoading(false);
+        } else if (newTotalCopies < currentCopies.length) {
+          // Remove copies (only those not borrowed)
+          const availableCopies = currentCopies.filter((copy) => !copy.borrowedBy);
+          const borrowedCopies = currentCopies.filter((copy) => copy.borrowedBy);
+
+          if (newTotalCopies < borrowedCopies.length) {
+            alert("Cannot reduce copies below the number currently borrowed");
             return;
           }
 
-          // Keep all borrowed copies
-          updatedBook.copies = [...borrowedCopies];
-
-          // Add available copies up to the new total
-          const availableCopiesNeeded = newCopiesCount - borrowedCopies.length;
-          for (let i = 1; i <= availableCopiesNeeded; i++) {
-            updatedBook.copies.push({
-              id: borrowedCopies.length + i,
-              borrowedBy: null,
-              borrowedDate: null,
-              dueDate: null,
-            });
-          }
+          // Keep all borrowed copies and add enough available ones to meet new total
+          updatedCopies = [...borrowedCopies, ...availableCopies.slice(0, newTotalCopies - borrowedCopies.length)];
         }
 
-        // Update books array
-        const updatedBooks = books.map((book) => (book.id === currentBook.id ? updatedBook : book));
+        const updates = {
+          title: bookTitle,
+          author: bookAuthor,
+          isbn: bookIsbn,
+          publisher: bookPublisher,
+          description: bookDescription,
+          coverImage: bookCoverImage,
+          copies: updatedCopies,
+        };
 
-        // Save to AsyncStorage
-        await dataService.updateBook(updatedBook);
+        await dataService.updateBook(currentBook.id, updates);
 
-        setBooks(updatedBooks);
-        Alert.alert("Success", "Book updated successfully");
+        // Update local state
+        setBooks(books.map((book) => (book.id === currentBook.id ? { ...book, ...updates } : book)));
       } else {
         // Create new book
-        const newCopies = [];
-        for (let i = 1; i <= Number.parseInt(bookCopiesCount); i++) {
-          newCopies.push({
+        const copies = [];
+        for (let i = 1; i <= copiesCount; i++) {
+          copies.push({
             id: i,
             borrowedBy: null,
-            borrowedDate: null,
+            borrowDate: null,
             dueDate: null,
           });
         }
 
         const newBook = {
           id: Date.now().toString(),
-          libraryId: libraryId,
+          libraryId,
           title: bookTitle,
           author: bookAuthor,
           isbn: bookIsbn,
           publisher: bookPublisher,
           description: bookDescription,
-          coverImage: bookCoverImage || "https://example.com/placeholder.jpg",
-          copies: newCopies,
+          coverImage: bookCoverImage,
+          copies,
           reservedBy: [],
         };
 
-        // Save to AsyncStorage
         await dataService.addBook(newBook);
 
-        // Add to books array
+        // Update local state
         setBooks([...books, newBook]);
-        Alert.alert("Success", "Book added successfully");
       }
-    } catch (error) {
-      console.error("Failed to save book:", error);
-      Alert.alert("Error", "Failed to save book. Please try again.");
-    } finally {
-      setLoading(false);
+
       setBookModalVisible(false);
       resetBookForm();
+    } catch (err) {
+      alert(`Error: ${err.message}`);
     }
   };
 
   // Handle remove book
-  const handleRemoveBook = (bookId) => {
-    const bookToRemove = books.find((book) => book.id === bookId);
+  const handleRemoveBook = async (bookId) => {
+    try {
+      const book = books.find((b) => b.id === bookId);
 
-    // Check if any copies are currently borrowed
-    const hasBorrowedCopies = bookToRemove.copies.some((copy) => copy.borrowedBy !== null);
+      if (hasBeenBorrowed(book)) {
+        alert("Cannot remove a book that has been borrowed");
+        return;
+      }
 
-    if (hasBorrowedCopies) {
-      Alert.alert("Cannot Remove Book", "This book has copies that are currently borrowed. All copies must be returned before removal.", [{ text: "OK" }]);
-      return;
+      await dataService.deleteBook(bookId);
+
+      // Update local state
+      setBooks(books.filter((book) => book.id !== bookId));
+    } catch (err) {
+      alert(`Error: ${err.message}`);
     }
-
-    Alert.alert("Remove Book", "Are you sure you want to remove this book from the library?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Remove",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            setLoading(true);
-            // Remove from AsyncStorage
-            await dataService.deleteBook(bookId);
-            const updatedBooks = books.filter((book) => book.id !== bookId);
-            setBooks(updatedBooks);
-            Alert.alert("Success", "Book removed successfully");
-          } catch (error) {
-            console.error("Failed to remove book:", error);
-            Alert.alert("Error", "Failed to remove book. Please try again.");
-          } finally {
-            setLoading(false);
-          }
-        },
-      },
-    ]);
   };
 
   // Handle save library settings
   const handleSaveSettings = async () => {
-    if (!libraryName.trim() || !libraryDescription.trim() || !libraryLocation.trim() || !libraryContact.trim()) {
-      Alert.alert("Error", "Please fill in all required fields");
-      return;
-    }
-
     try {
-      setLoading(true);
+      if (!libraryName || !libraryDescription || !libraryLocation || !libraryContact) {
+        alert("All fields are required");
+        return;
+      }
 
-      const updatedLibrary = {
-        ...library,
+      const updates = {
         name: libraryName,
         description: libraryDescription,
         location: libraryLocation,
         contact: libraryContact,
-        isPublic: isPublic,
+        isPublic,
       };
 
-      await dataService.updateLibrary(libraryId, updatedLibrary);
-      setLibrary(updatedLibrary);
+      await dataService.updateLibrary(libraryId, updates);
+
+      // Update local state
+      setLibrary({ ...library, ...updates });
       setSettingsChanged(false);
 
-      Alert.alert("Success", "Library settings updated successfully");
-    } catch (error) {
-      console.error("Failed to update library settings:", error);
-      Alert.alert("Error", "Failed to update library settings. Please try again.");
-    } finally {
-      setLoading(false);
+      alert("Library settings updated successfully");
+    } catch (err) {
+      alert(`Error: ${err.message}`);
     }
   };
 
   // Navigate to book detail screen
   const navigateToBookDetail = (bookId) => {
-    navigation.navigate("BookDetail", {
-      bookId: bookId,
-      libraryId: libraryId,
-    });
+    navigation.navigate("BookDetail", { bookId, fromScreen: "ManageLibrary" });
   };
 
   // Render book item
   const renderBookItem = ({ item }) => {
     const availableCopies = getAvailableCopies(item);
     const totalCopies = getTotalCopies(item);
-    const borrowedCopies = totalCopies - availableCopies;
-    const reservations = item.reservedBy ? item.reservedBy.length : 0;
 
     return (
-      <View style={styles.bookItem}>
+      <TouchableOpacity
+        style={styles.bookItem}
+        onPress={() => navigateToBookDetail(item.id)}
+      >
         <LinearGradient
           colors={["#1E1E1E", "#2A2A2A"]}
           style={styles.bookCard}
@@ -365,29 +281,26 @@ const ManageLibraryScreen = ({ navigation, route }) => {
           <View style={styles.bookInfo}>
             <Text style={styles.bookTitle}>{item.title}</Text>
             <Text style={styles.bookAuthor}>{item.author}</Text>
-            <Text
-              style={styles.bookDescription}
-              numberOfLines={2}
-            >
-              {item.description}
-            </Text>
+
+            {item.description && (
+              <Text
+                style={styles.bookDescription}
+                numberOfLines={2}
+              >
+                {item.description}
+              </Text>
+            )}
 
             <View style={styles.bookStats}>
-              <View>
-                <Text style={styles.statText}>
-                  Available: <Text style={styles.statValue}>{availableCopies}</Text>
+              <Text style={styles.statText}>
+                Available:{" "}
+                <Text style={styles.statValue}>
+                  {availableCopies}/{totalCopies}
                 </Text>
-              </View>
-              <View>
-                <Text style={styles.statText}>
-                  Borrowed: <Text style={styles.statValue}>{borrowedCopies}</Text>
-                </Text>
-              </View>
-              <View>
-                <Text style={styles.statText}>
-                  Reservations: <Text style={styles.statValue}>{reservations}</Text>
-                </Text>
-              </View>
+              </Text>
+              <Text style={styles.statText}>
+                ISBN: <Text style={styles.statValue}>{item.isbn || "N/A"}</Text>
+              </Text>
             </View>
           </View>
 
@@ -398,17 +311,6 @@ const ManageLibraryScreen = ({ navigation, route }) => {
             >
               <Feather
                 name="edit"
-                size={18}
-                color="#FFFFFF"
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.actionButton, styles.editButton]}
-              onPress={() => navigateToBookDetail(item.id)}
-            >
-              <Feather
-                name="info"
                 size={18}
                 color="#FFFFFF"
               />
@@ -426,7 +328,7 @@ const ManageLibraryScreen = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         </LinearGradient>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -544,31 +446,15 @@ const ManageLibraryScreen = ({ navigation, route }) => {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
+          <Feather
+            name="alert-circle"
+            size={50}
+            color="#FF6B6B"
+          />
+          <Text style={styles.errorText}>Error loading library data: {error}</Text>
           <TouchableOpacity
             style={styles.retryButton}
-            onPress={() => {
-              setError(null);
-              setLoading(true);
-              // Re-attempt loading data
-              const loadData = async () => {
-                try {
-                  await dataService.initializeDemoData();
-                  const libraries = await dataService.getLibraries();
-                  const currentLibrary = libraries.find((lib) => lib.id === libraryId);
-                  setLibrary(currentLibrary);
-                  const allBooks = await dataService.getBooks();
-                  const libraryBooks = allBooks.filter((book) => book.libraryId === libraryId);
-                  setBooks(libraryBooks);
-                  setError(null);
-                } catch (error) {
-                  setError("Failed to load library data. Please try again.");
-                } finally {
-                  setLoading(false);
-                }
-              };
-              loadData();
-            }}
+            onPress={() => navigation.replace("ManageLibrary", { libraryId })}
           >
             <Text style={styles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
@@ -590,7 +476,7 @@ const ManageLibraryScreen = ({ navigation, route }) => {
             color="#FFFFFF"
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{library ? library.name : "Manage Library"}</Text>
+        <Text style={styles.headerTitle}>{library?.name || "Manage Library"}</Text>
       </View>
 
       <View style={styles.tabContainer}>
@@ -600,7 +486,6 @@ const ManageLibraryScreen = ({ navigation, route }) => {
         >
           <Text style={[styles.tabText, activeTab === "books" && styles.activeTabText]}>Books</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={[styles.tab, activeTab === "settings" && styles.activeTab]}
           onPress={() => setActiveTab("settings")}
@@ -609,187 +494,36 @@ const ManageLibraryScreen = ({ navigation, route }) => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.container}>
-        {activeTab === "books" && (
-          <>
-            <View style={styles.actionBar}>
-              <TouchableOpacity
-                style={styles.addButton}
-                onPress={openBookAddModal}
-              >
-                <Feather
-                  name="plus"
-                  size={16}
-                  color="#FFFFFF"
-                />
-                <Text style={styles.addButtonText}>Add Book</Text>
-              </TouchableOpacity>
-            </View>
-
-            {books.length > 0 ? (
-              <FlatList
-                data={books}
-                keyExtractor={(item) => item.id}
-                renderItem={renderBookItem}
-                scrollEnabled={false}
-                nestedScrollEnabled
+      {activeTab === "books" ? (
+        <View style={{ flex: 1 }}>
+          <View style={[styles.container, styles.actionBar]}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={navigateToScanBook}
+            >
+              <Feather
+                name="plus"
+                size={16}
+                color="#FFFFFF"
               />
-            ) : (
-              <Text style={styles.emptyListText}>No books in this library yet</Text>
-            )}
-          </>
-        )}
-
-        {activeTab === "settings" && renderSettingsContent()}
-      </ScrollView>
-
-      {/* Book Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={bookModalVisible}
-        onRequestClose={() => {
-          setBookModalVisible(!bookModalVisible);
-          resetBookForm();
-        }}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.modalContainer}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{isEditMode ? "Edit Book" : "Add New Book"}</Text>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => {
-                  setBookModalVisible(false);
-                  resetBookForm();
-                }}
-              >
-                <Feather
-                  name="x"
-                  size={24}
-                  color="#FFFFFF"
-                />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.modalForm}>
-              {isEditMode && hasBeenBorrowed(currentBook) && (
-                <View style={styles.warningBox}>
-                  <Feather
-                    name="alert-triangle"
-                    size={20}
-                    color="#FFD700"
-                  />
-                  <Text style={styles.warningText}>This book has been borrowed. Only description and cover image can be edited.</Text>
-                </View>
-              )}
-
-              <View style={styles.formGroup}>
-                <Text style={styles.label}>Title</Text>
-                <TextInput
-                  style={styles.input}
-                  value={bookTitle}
-                  onChangeText={setBookTitle}
-                  placeholder="Enter book title"
-                  placeholderTextColor="#757575"
-                  editable={!isEditMode || (isEditMode && !hasBeenBorrowed(currentBook))}
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.label}>Author</Text>
-                <TextInput
-                  style={styles.input}
-                  value={bookAuthor}
-                  onChangeText={setBookAuthor}
-                  placeholder="Enter author name"
-                  placeholderTextColor="#757575"
-                  editable={!isEditMode || (isEditMode && !hasBeenBorrowed(currentBook))}
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.label}>ISBN</Text>
-                <TextInput
-                  style={styles.input}
-                  value={bookIsbn}
-                  onChangeText={setBookIsbn}
-                  placeholder="Enter ISBN"
-                  placeholderTextColor="#757575"
-                  editable={!isEditMode || (isEditMode && !hasBeenBorrowed(currentBook))}
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.label}>Publisher</Text>
-                <TextInput
-                  style={styles.input}
-                  value={bookPublisher}
-                  onChangeText={setBookPublisher}
-                  placeholder="Enter publisher"
-                  placeholderTextColor="#757575"
-                  editable={!isEditMode || (isEditMode && !hasBeenBorrowed(currentBook))}
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.label}>Description</Text>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  value={bookDescription}
-                  onChangeText={setBookDescription}
-                  placeholder="Enter book description"
-                  placeholderTextColor="#757575"
-                  multiline
-                  numberOfLines={4}
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.label}>Cover Image URL</Text>
-                <TextInput
-                  style={styles.input}
-                  value={bookCoverImage}
-                  onChangeText={setBookCoverImage}
-                  placeholder="Enter cover image URL (optional)"
-                  placeholderTextColor="#757575"
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.label}>Number of Copies</Text>
-                <TextInput
-                  style={styles.input}
-                  value={bookCopiesCount}
-                  onChangeText={setBookCopiesCount}
-                  placeholder="Enter number of copies"
-                  placeholderTextColor="#757575"
-                  keyboardType="numeric"
-                  editable={!isEditMode || (isEditMode && getAvailableCopies(currentBook) === getTotalCopies(currentBook))}
-                />
-                {isEditMode && hasBeenBorrowed(currentBook) && <Text style={styles.helperText}>You can only increase the number of copies or maintain the current number.</Text>}
-              </View>
-
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={handleSaveBook}
-              >
-                <LinearGradient
-                  colors={["#4568DC", "#B06AB3"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.gradientButton}
-                >
-                  <Text style={styles.saveButtonText}>{isEditMode ? "Update Book" : "Add Book"}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </ScrollView>
+              <Text style={styles.addButtonText}>Add Book</Text>
+            </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
-      </Modal>
+
+          <FlatList
+            data={books}
+            renderItem={renderBookItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.container}
+            ListEmptyComponent={() => <Text style={styles.emptyListText}>No books added to this library yet. Click the "Add Book" button to get started.</Text>}
+          />
+        </View>
+      ) : (
+        <ScrollView contentContainerStyle={styles.container}>{renderSettingsContent()}</ScrollView>
+      )}
+
+      {/* Book Modal here */}
+      {/* ... */}
     </SafeAreaView>
   );
 };

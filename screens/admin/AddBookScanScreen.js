@@ -6,112 +6,93 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { CameraView, Camera } from "expo-camera";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import dataService from "../../services/demo/dataService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 const SCANNER_WIDTH = width * 0.8;
 const SCANNER_HEIGHT = SCANNER_WIDTH;
 
-// Mock API for getting book data from ISBN
+// Function to get book data from demo data by ISBN
 const getBookFromISBN = async (isbn) => {
-  // In a real app, you would call a real API like Google Books or Open Library
-  // This is a simulated delay to mimic network request
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+  try {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  // Mock data responses
-  const mockBooks = {
-    9780062315007: {
-      title: "The Alchemist",
-      author: "Paulo Coelho",
-      publishedDate: "1988",
-      description: "The Alchemist follows the journey of an Andalusian shepherd boy named Santiago.",
-      pageCount: 208,
-      categories: ["Fiction"],
-      imageUrl: "https://covers.openlibrary.org/b/isbn/9780062315007-M.jpg",
-      language: "en",
-      publisher: "HarperOne",
-    },
-    9780061120084: {
-      title: "To Kill a Mockingbird",
-      author: "Harper Lee",
-      publishedDate: "1960",
-      description: "The story of racial injustice and the destruction of innocence.",
-      pageCount: 336,
-      categories: ["Fiction", "Classics"],
-      imageUrl: "https://covers.openlibrary.org/b/isbn/9780061120084-M.jpg",
-      language: "en",
-      publisher: "HarperCollins",
-    },
-    9781449373320: {
-      title: "Designing Data-Intensive Applications",
-      author: "Martin Kleppmann",
-      publishedDate: "2017",
-      description: "A guide to the architecture of data systems.",
-      pageCount: 616,
-      categories: ["Technology", "Computer Science"],
-      imageUrl: "https://covers.openlibrary.org/b/isbn/9781449373320-M.jpg",
-      language: "en",
-      publisher: "O'Reilly Media",
-    },
-    9786043751642: {
-      title: "Đừng khóc ở Sài Gòn",
-      author: "Xuân Thảo",
-      publishedDate: "2022",
-      description:
-        "Sài Gòn thường được gọi là thành phố hoa lệ, hoa cho người giàu và lệ cho người nghèo. Nhịp sống ở thành phố này bao giờ cũng vội vã, tấp nập… nhưng với “Đừng khóc ở Sài Gòn”, ta được chậm lại để cảm nhận một Sài Gòn thật lắng đọng và giàu chất thơ…",
-      pageCount: 215,
-      categories: ["Life", "Literature"],
-      imageUrl: "https://cdn1.fahasa.com/media/catalog/product/8/9/8935325006562.jpg",
-      language: "Vietnamese",
-      publisher: "SkyBooks",
-    },
-    9786043189216: {
-      title: "Tiếng gọi từ vì sao xa",
-      author: "Shinkai Makoto - Ooba Waku",
-      publishedDate: "2021",
-      description: "No description available.",
-      pageCount: 1,
-      categories: ["Novel", "Literature", "Romance"],
-      imageUrl: "https://product.hstatic.net/200000287623/product/tieng-goi-tu-vi-sao-xa__1__d5764cee220b47ba94d49562e9443a72_master.jpg",
-      language: "Vietnamese",
-      publisher: "IPM",
-    },
-    9786040230713: {
-      title: "Xác suất thống kê",
-      author: "PGS.TS. Tô Văn Ban",
-      publishedDate: "2020",
-      description: "Chương 1. Biến cố, xác suất biến cố; Chương 2. Biến ngẫu nhiên; Chương 3. Vectơ ngẫu nhiên; Chương 4. Thống kê; Chương 5. Mô hình hồi quy tuyến tính; Chương 6. Bài tập.",
-      pageCount: 319,
-      categories: ["Science", "Mathematics", "University"],
-      imageUrl: "https://hfs1.duytan.edu.vn/upload/sach_anh/87803.jpg",
-      language: "Vietnamese",
-      publisher: "NXB Giáo dục Việt Nam - Hà Nội",
-    },
-    9786046710554: {
-      title: "Cơ sở công nghệ phần mềm",
-      author: "Lương Mạnh Bá",
-      published: "2018",
-      description:
-        "Tài liệu cung cấp những kiến thức cơ bản của lĩnh vực công nghệ phần mềm: các khái niệm, qui trình và các, mô hình chế tác phần mềm theo vòng đời phát triển phần mềm.Đối tượng chính của tài liệu này là sinh viên năm thứ 3 hay năm 4 ngành CNTT. Nó cũng hữu ích cho các kỹ sư muốn hiểu thêm các khái niệm, các qui trình chế tác theo các chuẩn của thế giới. Tài liệu gồm 6 phần với 13 chương. Phần 1 gồm 2 chương trình bày các khái niệm về phần mềm. Phần 2 dành cho tiến trình quản lý việc chế tác phần mềm- quản lý dự án phần mềm. Phần 3 trình bày giai đoạn đầu tiên của quá trình phát triển phần mềm. Phần 4 giới thiệu về quá trình thiết kế hệ thống. Phần 5 đề cập đến giai đoạn cuối cùng của qui trình chế tác phần mềm, kiểm thử và bảo trì. Phần 6 của giáo trình nhằm giới thiệu một số vấn đề cần quan tâm tìm hiểu thêm như: chuẩn ISO về chế tác phần mềm, mô hình và chuẩn CMMI, qui trình phát triển phần mềm hợp nhất -RUP",
-      pageCount: 246,
-      categories: ["Science", "Technology", "University", "Database"],
-      imageUrl: "https://lib.caothang.edu.vn/book_images/25166.jpg",
-      language: "Vietnamese",
-      publisher: "NXB Khoa học kĩ thuật",
-    },
-  };
+    // Get demo data from AsyncStorage
+    const demoDataStr = await AsyncStorage.getItem(dataService.STORAGE_KEYS.DEMO);
+    const demoData = JSON.parse(demoDataStr || "{}");
 
-  if (mockBooks[isbn]) {
-    return { success: true, data: { isbn, ...mockBooks[isbn] } };
-  } else {
-    // Default response for unknown ISBNs
+    // Check if the ISBN exists in demo data
+    if (demoData.books && demoData.books[isbn]) {
+      return {
+        success: true,
+        data: {
+          isbn,
+          ...demoData.books[isbn],
+        },
+      };
+    }
+
+    // If not in demo data, check our hardcoded mock books
+    const mockBooks = {
+      9780062315007: {
+        title: "The Alchemist",
+        author: "Paulo Coelho",
+        publishedDate: "1988",
+        description: "The Alchemist follows the journey of an Andalusian shepherd boy named Santiago.",
+        pageCount: 208,
+        categories: ["Fiction"],
+        imageUrl: "https://covers.openlibrary.org/b/isbn/9780062315007-M.jpg",
+        language: "en",
+        publisher: "HarperOne",
+      },
+      9780061120084: {
+        title: "To Kill a Mockingbird",
+        author: "Harper Lee",
+        publishedDate: "1960",
+        description: "The story of racial injustice and the destruction of innocence.",
+        pageCount: 336,
+        categories: ["Fiction", "Classics"],
+        imageUrl: "https://covers.openlibrary.org/b/isbn/9780061120084-M.jpg",
+        language: "en",
+        publisher: "HarperCollins",
+      },
+      9781449373320: {
+        title: "Designing Data-Intensive Applications",
+        author: "Martin Kleppmann",
+        publishedDate: "2017",
+        description: "A guide to the architecture of data systems.",
+        pageCount: 616,
+        categories: ["Technology", "Computer Science"],
+        imageUrl: "https://covers.openlibrary.org/b/isbn/9781449373320-M.jpg",
+        language: "en",
+        publisher: "O'Reilly Media",
+      },
+    };
+
+    if (mockBooks[isbn]) {
+      return { success: true, data: { isbn, ...mockBooks[isbn] } };
+    }
+
+    // Not found in any data source
     return {
       success: false,
       error: "Book not found. You can add details manually.",
     };
+  } catch (err) {
+    console.error("Error fetching book data:", err);
+    return {
+      success: false,
+      error: "Failed to fetch book data. Please try again.",
+    };
   }
 };
 
-const AddBookScanScreen = ({ navigation }) => {
+const AddBookScanScreen = ({ navigation, route }) => {
+  // Extract libraryId from route params
+  const libraryId = route.params?.libraryId;
+
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [scanning, setScanning] = useState(true);
@@ -183,24 +164,66 @@ const AddBookScanScreen = ({ navigation }) => {
     setIsbn("");
   };
 
-  const addToLibrary = () => {
+  const addToLibrary = async () => {
     setLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      // Create copies array with one copy by default
+      const copies = [
+        {
+          id: 1,
+          borrowedBy: null,
+          borrowDate: null,
+          dueDate: null,
+        },
+      ];
+
+      // Create book object with required data
+      const newBook = {
+        id: Date.now().toString(),
+        libraryId: libraryId, // Use the libraryId from route params
+        title: bookData.title,
+        author: bookData.author,
+        isbn: bookData.isbn,
+        publisher: bookData.publisher,
+        description: bookData.description,
+        coverImage: bookData.imageUrl,
+        copies: copies,
+        reservedBy: [],
+      };
+
+      // Add book to data storage
+      await dataService.addBook(newBook);
+
+      // Show success message
       Alert.alert("Success", `"${bookData.title}" has been added to the library catalog.`, [
         {
           text: "OK",
-          onPress: () => navigation.navigate("ManageBooks"),
+          onPress: () => {
+            if (libraryId) {
+              // Navigate back to ManageLibrary if we came from there
+              navigation.navigate("ManageLibrary", { libraryId });
+            } else {
+              // Otherwise navigate to ManageBooks (default behavior)
+              navigation.navigate("ManageBooks");
+            }
+          },
         },
       ]);
-    }, 1000);
+    } catch (err) {
+      Alert.alert("Error", "Failed to add book to library. Please try again.");
+      console.error("Error adding book:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const editManually = () => {
     // Navigate to manual add/edit with pre-filled data
-    navigation.navigate("AddBookManual", { bookData });
+    navigation.navigate("AddBookManual", {
+      bookData,
+      libraryId, // Pass the libraryId to the manual screen
+    });
   };
 
   if (hasPermission === null) {
@@ -230,7 +253,7 @@ const AddBookScanScreen = ({ navigation }) => {
           <Text style={styles.subText}>Please enable camera access in your device settings to scan book barcodes.</Text>
           <TouchableOpacity
             style={styles.manualEntryButton}
-            onPress={() => navigation.navigate("AddBookManual")}
+            onPress={() => navigation.navigate("AddBookManual", { libraryId })}
           >
             <Text style={styles.manualEntryText}>Enter Book Details Manually</Text>
           </TouchableOpacity>
@@ -345,7 +368,7 @@ const AddBookScanScreen = ({ navigation }) => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={() => navigation.navigate("AddBookManual", { isbn })}
+                    onPress={() => navigation.navigate("AddBookManual", { isbn, libraryId })}
                   >
                     <LinearGradient
                       colors={["#4568DC", "#B06AB3"]}
