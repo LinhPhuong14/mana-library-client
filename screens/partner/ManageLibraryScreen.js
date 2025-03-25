@@ -1,202 +1,24 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Modal,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert, Modal, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Switch } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
-
-// Sample data for libraries
-const initialLibraries = [
-  {
-    id: "123",
-    name: "Main Library",
-    owner: "user1",
-    description: "The main library collection",
-    location: "Building A, Floor 2",
-    contact: "library@example.com",
-    isPublic: true,
-    createdAt: "2023-01-15T08:00:00.000Z",
-  },
-];
-
-// Update the copies structure in initialBooks to include dueDate
-const initialBooks = [
-  {
-    id: "1",
-    libraryId: "123",
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    isbn: "9780743273565",
-    publisher: "Scribner",
-    description: "A classic novel set in the Roaring Twenties.",
-    coverImage: "https://example.com/gatsby.jpg",
-    copies: [
-      {
-        id: 1,
-        borrowedBy: "user2",
-        borrowedDate: "2023-03-01T08:00:00.000Z",
-        dueDate: "2023-03-15T08:00:00.000Z",
-      },
-      {
-        id: 2,
-        borrowedBy: "user3",
-        borrowedDate: "2023-03-05T08:00:00.000Z",
-        dueDate: "2023-03-19T08:00:00.000Z",
-      },
-      { id: 3, borrowedBy: null, borrowedDate: null, dueDate: null },
-      { id: 4, borrowedBy: null, borrowedDate: null, dueDate: null },
-      { id: 5, borrowedBy: null, borrowedDate: null, dueDate: null },
-    ],
-    reservedBy: [],
-  },
-  {
-    id: "2",
-    libraryId: "123",
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    isbn: "9780061120084",
-    publisher: "HarperCollins",
-    description: "A profound novel about racial injustice.",
-    coverImage: "https://example.com/mockingbird.jpg",
-    copies: [
-      {
-        id: 1,
-        borrowedBy: "user4",
-        borrowedDate: "2023-02-15T08:00:00.000Z",
-        dueDate: "2023-03-01T08:00:00.000Z",
-      },
-      {
-        id: 2,
-        borrowedBy: "user5",
-        borrowedDate: "2023-03-10T08:00:00.000Z",
-        dueDate: "2023-03-24T08:00:00.000Z",
-      },
-      { id: 3, borrowedBy: null, borrowedDate: null, dueDate: null },
-    ],
-    reservedBy: ["user6"],
-  },
-  {
-    id: "3",
-    libraryId: "123",
-    title: "1984",
-    author: "George Orwell",
-    isbn: "9780451524935",
-    publisher: "Signet Classics",
-    description: "A dystopian novel about totalitarianism.",
-    coverImage: "https://example.com/1984.jpg",
-    copies: [
-      { id: 1, borrowedBy: null, borrowedDate: null, dueDate: null },
-      { id: 2, borrowedBy: null, borrowedDate: null, dueDate: null },
-      { id: 3, borrowedBy: null, borrowedDate: null, dueDate: null },
-      { id: 4, borrowedBy: null, borrowedDate: null, dueDate: null },
-    ],
-    reservedBy: [],
-  },
-  {
-    id: "4",
-    libraryId: "123",
-    title: "Pride and Prejudice",
-    author: "Jane Austen",
-    isbn: "9780141439518",
-    publisher: "Penguin Classics",
-    description: "A romantic novel of manners.",
-    coverImage: "https://example.com/pride.jpg",
-    copies: [
-      {
-        id: 1,
-        borrowedBy: "user7",
-        borrowedDate: "2023-01-20T08:00:00.000Z",
-        dueDate: "2023-02-03T08:00:00.000Z",
-      },
-      {
-        id: 2,
-        borrowedBy: "user8",
-        borrowedDate: "2023-02-25T08:00:00.000Z",
-        dueDate: "2023-03-11T08:00:00.000Z",
-      },
-    ],
-    reservedBy: ["user9", "user10", "user11"],
-  },
-];
-
-// Sample data for fines
-const initialFines = [
-  {
-    id: "1",
-    type: "Overdue",
-    amount: 0.5,
-    description: "Per day for overdue books",
-    active: true,
-  },
-  {
-    id: "2",
-    type: "Damaged",
-    amount: 15.0,
-    description: "For minor damage to books",
-    active: true,
-  },
-  {
-    id: "3",
-    type: "Lost",
-    amount: 50.0,
-    description: "For lost or severely damaged books",
-    active: true,
-  },
-];
-
-// Add transactions array to track fines
-const initialTransactions = [
-  {
-    id: "1",
-    userId: "user4",
-    bookId: "2",
-    copyId: 1,
-    type: "fine",
-    reason: "overdue",
-    amount: 7.5,
-    status: "pending",
-    createdAt: "2023-03-10T08:00:00.000Z",
-    daysOverdue: 15,
-  },
-];
+import dataService from "../../services/demo/dataService";
 
 const ManageLibraryScreen = ({ navigation, route }) => {
   const libraryId = route?.params?.libraryId;
 
-  const [library, setLibrary] = useState(
-    initialLibraries.find((lib) => lib.id === libraryId)
-  );
-  const [books, setBooks] = useState(
-    initialBooks.filter((book) => book.libraryId === libraryId)
-  );
-  const [fines, setFines] = useState(initialFines);
-  // Add transactions state after the fines state
-  const [transactions, setTransactions] = useState(initialTransactions);
-  const [loading, setLoading] = useState(false);
+  // State
+  const [library, setLibrary] = useState(null);
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("books");
-
-  // Modal states
   const [bookModalVisible, setBookModalVisible] = useState(false);
-  const [fineModalVisible, setFineModalVisible] = useState(false);
   const [currentBook, setCurrentBook] = useState(null);
-  const [currentFine, setCurrentFine] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Form states for book modal
+  // Book form state
   const [bookTitle, setBookTitle] = useState("");
   const [bookAuthor, setBookAuthor] = useState("");
   const [bookIsbn, setBookIsbn] = useState("");
@@ -205,84 +27,54 @@ const ManageLibraryScreen = ({ navigation, route }) => {
   const [bookCoverImage, setBookCoverImage] = useState("");
   const [bookCopiesCount, setBookCopiesCount] = useState("");
 
-  // Form states for fine modal
-  const [fineType, setFineType] = useState("");
-  const [fineAmount, setFineAmount] = useState("");
-  const [fineDescription, setFineDescription] = useState("");
-  const [fineActive, setFineActive] = useState(true);
+  // Library settings state
+  const [libraryName, setLibraryName] = useState("");
+  const [libraryDescription, setLibraryDescription] = useState("");
+  const [libraryLocation, setLibraryLocation] = useState("");
+  const [libraryContact, setLibraryContact] = useState("");
+  const [isPublic, setIsPublic] = useState(true);
+  const [settingsChanged, setSettingsChanged] = useState(false);
 
-  // Add useEffect to check for overdue books when component mounts
+  // Load data from AsyncStorage
   useEffect(() => {
-    checkOverdueBooks();
-  }, []);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        await dataService.initializeDemoData();
 
-  // Function to check for overdue books and apply fines
-  const checkOverdueBooks = () => {
-    const currentDate = new Date();
-    const newTransactions = [...transactions];
-    let finesApplied = false;
+        // Load library data
+        const libraries = await dataService.getLibraries();
+        const currentLibrary = libraries.find((lib) => lib.id === libraryId);
 
-    books.forEach((book) => {
-      book.copies.forEach((copy) => {
-        if (copy.borrowedBy && copy.dueDate) {
-          const dueDate = new Date(copy.dueDate);
-
-          // Check if book is overdue
-          if (currentDate > dueDate) {
-            // Calculate days overdue
-            const timeDiff = currentDate.getTime() - dueDate.getTime();
-            const daysOverdue = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-            // Check if a fine already exists for this copy
-            const existingFine = transactions.find(
-              (t) =>
-                t.bookId === book.id &&
-                t.copyId === copy.id &&
-                t.type === "fine" &&
-                t.reason === "overdue" &&
-                t.status === "pending"
-            );
-
-            if (!existingFine) {
-              // Find the overdue fine rate
-              const overdueFine = fines.find(
-                (f) => f.type === "Overdue" && f.active
-              );
-
-              if (overdueFine) {
-                // Create new fine transaction
-                const fineAmount = overdueFine.amount * daysOverdue;
-
-                const newFine = {
-                  id: Date.now().toString(),
-                  userId: copy.borrowedBy,
-                  bookId: book.id,
-                  copyId: copy.id,
-                  type: "fine",
-                  reason: "overdue",
-                  amount: fineAmount,
-                  status: "pending",
-                  createdAt: new Date().toISOString(),
-                  daysOverdue: daysOverdue,
-                };
-
-                newTransactions.push(newFine);
-                finesApplied = true;
-              }
-            }
-          }
+        if (!currentLibrary) {
+          setError("Library not found");
+          setLoading(false);
+          return;
         }
-      });
-    });
 
-    if (finesApplied) {
-      setTransactions(newTransactions);
-      Alert.alert(
-        "Overdue Fines Applied",
-        "Fines have been automatically applied to overdue books."
-      );
+        setLibrary(currentLibrary);
+        setLibraryName(currentLibrary.name || "");
+        setLibraryDescription(currentLibrary.description || "");
+        setLibraryLocation(currentLibrary.location || "");
+        setLibraryContact(currentLibrary.contact || "");
+        setIsPublic(currentLibrary.isPublic !== false);
+
+        // Load books for this library
+        const allBooks = await dataService.getBooks();
+        const libraryBooks = allBooks.filter((book) => book.libraryId === libraryId);
+        setBooks(libraryBooks);
+      } catch (error) {
+        console.error("Failed to load library data:", error);
+        setError("Failed to load library data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (libraryId) {
+      loadData();
     }
-  };
+  }, [libraryId]);
 
   // Helper function to count available copies
   const getAvailableCopies = (book) => {
@@ -296,10 +88,7 @@ const ManageLibraryScreen = ({ navigation, route }) => {
 
   // Helper function to check if book has been borrowed
   const hasBeenBorrowed = (book) => {
-    return (
-      book.copies.some((copy) => copy.borrowedBy !== null) ||
-      book.copies.length !== getAvailableCopies(book)
-    );
+    return book.copies.some((copy) => copy.borrowedBy !== null) || book.copies.length !== getAvailableCopies(book);
   };
 
   // Reset book form
@@ -315,42 +104,28 @@ const ManageLibraryScreen = ({ navigation, route }) => {
     setIsEditMode(false);
   };
 
-  // Reset fine form
-  const resetFineForm = () => {
-    setFineType("");
-    setFineAmount("");
-    setFineDescription("");
-    setFineActive(true);
-    setCurrentFine(null);
-    setIsEditMode(false);
-  };
-
   // Open book modal for editing
   const openBookEditModal = (book) => {
     if (hasBeenBorrowed(book)) {
       // If book has been borrowed, show restricted edit options
-      Alert.alert(
-        "Restricted Editing",
-        "This book has been borrowed. You can only edit the cover image and description.",
-        [
-          {
-            text: "Edit Limited Fields",
-            onPress: () => {
-              setCurrentBook(book);
-              setBookTitle(book.title);
-              setBookAuthor(book.author);
-              setBookIsbn(book.isbn);
-              setBookPublisher(book.publisher);
-              setBookDescription(book.description);
-              setBookCoverImage(book.coverImage || "");
-              setBookCopiesCount(book.copies.length.toString());
-              setIsEditMode(true);
-              setBookModalVisible(true);
-            },
+      Alert.alert("Restricted Editing", "This book has been borrowed. You can only edit the cover image and description.", [
+        {
+          text: "Edit Limited Fields",
+          onPress: () => {
+            setCurrentBook(book);
+            setBookTitle(book.title);
+            setBookAuthor(book.author);
+            setBookIsbn(book.isbn);
+            setBookPublisher(book.publisher);
+            setBookDescription(book.description);
+            setBookCoverImage(book.coverImage || "");
+            setBookCopiesCount(book.copies.length.toString());
+            setIsEditMode(true);
+            setBookModalVisible(true);
           },
-          { text: "Cancel", style: "cancel" },
-        ]
-      );
+        },
+        { text: "Cancel", style: "cancel" },
+      ]);
     } else {
       // Full edit options for books that haven't been borrowed
       setCurrentBook(book);
@@ -372,33 +147,10 @@ const ManageLibraryScreen = ({ navigation, route }) => {
     setBookModalVisible(true);
   };
 
-  // Open fine modal for editing
-  const openFineEditModal = (fine) => {
-    setCurrentFine(fine);
-    setFineType(fine.type);
-    setFineAmount(fine.amount.toString());
-    setFineDescription(fine.description);
-    setFineActive(fine.active);
-    setIsEditMode(true);
-    setFineModalVisible(true);
-  };
-
-  // Open fine modal for adding
-  const openFineAddModal = () => {
-    resetFineForm();
-    setFineModalVisible(true);
-  };
-
   // Handle save book
-  const handleSaveBook = () => {
+  const handleSaveBook = async () => {
     // Validate form
-    if (
-      !bookTitle.trim() ||
-      !bookAuthor.trim() ||
-      !bookIsbn.trim() ||
-      !bookPublisher.trim() ||
-      !bookDescription.trim()
-    ) {
+    if (!bookTitle.trim() || !bookAuthor.trim() || !bookIsbn.trim() || !bookDescription.trim()) {
       Alert.alert("Error", "Please fill in all required fields");
       return;
     }
@@ -411,15 +163,13 @@ const ManageLibraryScreen = ({ navigation, route }) => {
 
     setLoading(true);
 
-    setTimeout(() => {
+    try {
       if (isEditMode && currentBook) {
         // Check if book has been borrowed
         const hasBorrowed = hasBeenBorrowed(currentBook);
 
         // Get current borrowed copies to preserve them
-        const borrowedCopies = currentBook.copies.filter(
-          (copy) => copy.borrowedBy !== null
-        );
+        const borrowedCopies = currentBook.copies.filter((copy) => copy.borrowedBy !== null);
 
         // Create updated book object
         const updatedBook = {
@@ -442,16 +192,18 @@ const ManageLibraryScreen = ({ navigation, route }) => {
           // Add new copies
           const newCopies = [];
           for (let i = currentCopiesCount + 1; i <= newCopiesCount; i++) {
-            newCopies.push({ id: i, borrowedBy: null });
+            newCopies.push({
+              id: i,
+              borrowedBy: null,
+              borrowedDate: null,
+              dueDate: null,
+            });
           }
           updatedBook.copies = [...currentBook.copies, ...newCopies];
         } else if (newCopiesCount < currentCopiesCount) {
           // Remove copies, but keep borrowed ones
           if (newCopiesCount < borrowedCopies.length) {
-            Alert.alert(
-              "Error",
-              "Cannot reduce copies below the number currently borrowed"
-            );
+            Alert.alert("Error", "Cannot reduce copies below the number currently borrowed");
             setLoading(false);
             return;
           }
@@ -465,14 +217,17 @@ const ManageLibraryScreen = ({ navigation, route }) => {
             updatedBook.copies.push({
               id: borrowedCopies.length + i,
               borrowedBy: null,
+              borrowedDate: null,
+              dueDate: null,
             });
           }
         }
 
         // Update books array
-        const updatedBooks = books.map((book) =>
-          book.id === currentBook.id ? updatedBook : book
-        );
+        const updatedBooks = books.map((book) => (book.id === currentBook.id ? updatedBook : book));
+
+        // Save to AsyncStorage
+        await dataService.updateBook(updatedBook);
 
         setBooks(updatedBooks);
         Alert.alert("Success", "Book updated successfully");
@@ -480,7 +235,12 @@ const ManageLibraryScreen = ({ navigation, route }) => {
         // Create new book
         const newCopies = [];
         for (let i = 1; i <= Number.parseInt(bookCopiesCount); i++) {
-          newCopies.push({ id: i, borrowedBy: null });
+          newCopies.push({
+            id: i,
+            borrowedBy: null,
+            borrowedDate: null,
+            dueDate: null,
+          });
         }
 
         const newBook = {
@@ -496,70 +256,21 @@ const ManageLibraryScreen = ({ navigation, route }) => {
           reservedBy: [],
         };
 
+        // Save to AsyncStorage
+        await dataService.addBook(newBook);
+
         // Add to books array
         setBooks([...books, newBook]);
         Alert.alert("Success", "Book added successfully");
       }
-
+    } catch (error) {
+      console.error("Failed to save book:", error);
+      Alert.alert("Error", "Failed to save book. Please try again.");
+    } finally {
       setLoading(false);
       setBookModalVisible(false);
       resetBookForm();
-    }, 500);
-  };
-
-  // Handle save fine
-  const handleSaveFine = () => {
-    // Validate form
-    if (!fineType.trim() || !fineAmount.trim() || !fineDescription.trim()) {
-      Alert.alert("Error", "Please fill in all required fields");
-      return;
     }
-
-    const amount = Number.parseFloat(fineAmount);
-    if (isNaN(amount) || amount <= 0) {
-      Alert.alert("Error", "Amount must be a positive number");
-      return;
-    }
-
-    setLoading(true);
-
-    setTimeout(() => {
-      if (isEditMode && currentFine) {
-        // Update fine
-        const updatedFine = {
-          ...currentFine,
-          type: fineType,
-          amount: amount,
-          description: fineDescription,
-          active: fineActive,
-        };
-
-        // Update fines array
-        const updatedFines = fines.map((fine) =>
-          fine.id === currentFine.id ? updatedFine : fine
-        );
-
-        setFines(updatedFines);
-        Alert.alert("Success", "Fine updated successfully");
-      } else {
-        // Create new fine
-        const newFine = {
-          id: Date.now().toString(),
-          type: fineType,
-          amount: amount,
-          description: fineDescription,
-          active: fineActive,
-        };
-
-        // Add to fines array
-        setFines([...fines, newFine]);
-        Alert.alert("Success", "Fine added successfully");
-      }
-
-      setLoading(false);
-      setFineModalVisible(false);
-      resetFineForm();
-    }, 500);
   };
 
   // Handle remove book
@@ -567,75 +278,67 @@ const ManageLibraryScreen = ({ navigation, route }) => {
     const bookToRemove = books.find((book) => book.id === bookId);
 
     // Check if any copies are currently borrowed
-    const hasBorrowedCopies = bookToRemove.copies.some(
-      (copy) => copy.borrowedBy !== null
-    );
+    const hasBorrowedCopies = bookToRemove.copies.some((copy) => copy.borrowedBy !== null);
 
     if (hasBorrowedCopies) {
-      Alert.alert(
-        "Cannot Remove Book",
-        "This book has copies that are currently borrowed. All copies must be returned before removal.",
-        [{ text: "OK" }]
-      );
+      Alert.alert("Cannot Remove Book", "This book has copies that are currently borrowed. All copies must be returned before removal.", [{ text: "OK" }]);
       return;
     }
 
-    Alert.alert(
-      "Remove Book",
-      "Are you sure you want to remove this book from the library?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Remove",
-          style: "destructive",
-          onPress: () => {
+    Alert.alert("Remove Book", "Are you sure you want to remove this book from the library?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Remove",
+        style: "destructive",
+        onPress: async () => {
+          try {
             setLoading(true);
-            setTimeout(() => {
-              const updatedBooks = books.filter((book) => book.id !== bookId);
-              setBooks(updatedBooks);
-              setLoading(false);
-              Alert.alert("Success", "Book removed successfully");
-            }, 500);
-          },
+            // Remove from AsyncStorage
+            await dataService.deleteBook(bookId);
+            const updatedBooks = books.filter((book) => book.id !== bookId);
+            setBooks(updatedBooks);
+            Alert.alert("Success", "Book removed successfully");
+          } catch (error) {
+            console.error("Failed to remove book:", error);
+            Alert.alert("Error", "Failed to remove book. Please try again.");
+          } finally {
+            setLoading(false);
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
-  // Handle remove fine
-  const handleRemoveFine = (fineId) => {
-    Alert.alert(
-      "Remove Fine",
-      "Are you sure you want to remove this fine type?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Remove",
-          style: "destructive",
-          onPress: () => {
-            setLoading(true);
-            setTimeout(() => {
-              const updatedFines = fines.filter((fine) => fine.id !== fineId);
-              setFines(updatedFines);
-              setLoading(false);
-              Alert.alert("Success", "Fine removed successfully");
-            }, 500);
-          },
-        },
-      ]
-    );
-  };
+  // Handle save library settings
+  const handleSaveSettings = async () => {
+    if (!libraryName.trim() || !libraryDescription.trim() || !libraryLocation.trim() || !libraryContact.trim()) {
+      Alert.alert("Error", "Please fill in all required fields");
+      return;
+    }
 
-  // Toggle fine active status
-  const toggleFineStatus = (fineId) => {
-    const updatedFines = fines.map((fine) => {
-      if (fine.id === fineId) {
-        return { ...fine, active: !fine.active };
-      }
-      return fine;
-    });
+    try {
+      setLoading(true);
 
-    setFines(updatedFines);
+      const updatedLibrary = {
+        ...library,
+        name: libraryName,
+        description: libraryDescription,
+        location: libraryLocation,
+        contact: libraryContact,
+        isPublic: isPublic,
+      };
+
+      await dataService.updateLibrary(libraryId, updatedLibrary);
+      setLibrary(updatedLibrary);
+      setSettingsChanged(false);
+
+      Alert.alert("Success", "Library settings updated successfully");
+    } catch (error) {
+      console.error("Failed to update library settings:", error);
+      Alert.alert("Error", "Failed to update library settings. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Navigate to book detail screen
@@ -650,35 +353,41 @@ const ManageLibraryScreen = ({ navigation, route }) => {
   const renderBookItem = ({ item }) => {
     const availableCopies = getAvailableCopies(item);
     const totalCopies = getTotalCopies(item);
-    const reservationsCount = item.reservedBy.length;
+    const borrowedCopies = totalCopies - availableCopies;
+    const reservations = item.reservedBy ? item.reservedBy.length : 0;
 
     return (
-      <TouchableOpacity
-        onPress={() => navigateToBookDetail(item.id)}
-        style={styles.bookItem}
-      >
+      <View style={styles.bookItem}>
         <LinearGradient
-          colors={["#4568DC", "#B06AB3"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#1E1E1E", "#2A2A2A"]}
           style={styles.bookCard}
         >
           <View style={styles.bookInfo}>
             <Text style={styles.bookTitle}>{item.title}</Text>
-            <Text style={styles.bookAuthor}>by {item.author}</Text>
-            <Text style={styles.bookDescription}>{item.description}</Text>
+            <Text style={styles.bookAuthor}>{item.author}</Text>
+            <Text
+              style={styles.bookDescription}
+              numberOfLines={2}
+            >
+              {item.description}
+            </Text>
 
             <View style={styles.bookStats}>
-              <Text style={styles.statText}>
-                Available:{" "}
-                <Text style={styles.statValue}>
-                  {availableCopies}/{totalCopies}
+              <View>
+                <Text style={styles.statText}>
+                  Available: <Text style={styles.statValue}>{availableCopies}</Text>
                 </Text>
-              </Text>
-              <Text style={styles.statText}>
-                Reservations:{" "}
-                <Text style={styles.statValue}>{reservationsCount}</Text>
-              </Text>
+              </View>
+              <View>
+                <Text style={styles.statText}>
+                  Borrowed: <Text style={styles.statValue}>{borrowedCopies}</Text>
+                </Text>
+              </View>
+              <View>
+                <Text style={styles.statText}>
+                  Reservations: <Text style={styles.statValue}>{reservations}</Text>
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -687,215 +396,186 @@ const ManageLibraryScreen = ({ navigation, route }) => {
               style={[styles.actionButton, styles.editButton]}
               onPress={() => openBookEditModal(item)}
             >
-              <Feather name="edit" size={18} color="#FFFFFF" />
+              <Feather
+                name="edit"
+                size={18}
+                color="#FFFFFF"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.actionButton, styles.editButton]}
+              onPress={() => navigateToBookDetail(item.id)}
+            >
+              <Feather
+                name="info"
+                size={18}
+                color="#FFFFFF"
+              />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.actionButton, styles.removeButton]}
               onPress={() => handleRemoveBook(item.id)}
             >
-              <Feather name="trash-2" size={18} color="#FFFFFF" />
+              <Feather
+                name="trash-2"
+                size={18}
+                color="#FFFFFF"
+              />
             </TouchableOpacity>
           </View>
         </LinearGradient>
-      </TouchableOpacity>
+      </View>
     );
   };
 
-  // Render fine item
-  const renderFineItem = ({ item }) => (
-    <View style={styles.fineItem}>
-      <View style={styles.fineInfo}>
-        <View style={styles.fineHeader}>
-          <Text style={styles.fineType}>{item.type}</Text>
-          <View
-            style={[
-              styles.statusIndicator,
-              item.active ? styles.activeStatus : styles.inactiveStatus,
-            ]}
-          />
-        </View>
-        <Text style={styles.fineAmount}>${item.amount.toFixed(2)}</Text>
-        <Text style={styles.fineDescription}>{item.description}</Text>
-      </View>
-
-      <View style={styles.fineActions}>
-        <TouchableOpacity
-          style={[styles.fineAction, styles.toggleButton]}
-          onPress={() => toggleFineStatus(item.id)}
-        >
-          <Feather
-            name={item.active ? "eye-off" : "eye"}
-            size={18}
-            color="#FFFFFF"
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.fineAction, styles.editButton]}
-          onPress={() => openFineEditModal(item)}
-        >
-          <Feather name="edit" size={18} color="#FFFFFF" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.fineAction, styles.removeButton]}
-          onPress={() => handleRemoveFine(item.id)}
-        >
-          <Feather name="trash-2" size={18} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
-  // Render fines content
-  const renderFinesContent = () => (
-    <View style={styles.finesContainer}>
-      <View style={styles.finesHeader}>
-        <Text style={styles.finesTitle}>Library Fines</Text>
-        <TouchableOpacity
-          style={styles.addFineButton}
-          onPress={openFineAddModal}
-        >
-          <Feather name="plus" size={18} color="#FFFFFF" />
-          <Text style={styles.addFineButtonText}>Add Fine</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.finesDescription}>
-        Set and manage fines for overdue books, damaged items, and other library
-        violations.
-      </Text>
-
-      <FlatList
-        data={fines}
-        keyExtractor={(item) => item.id}
-        renderItem={renderFineItem}
-        scrollEnabled={false}
-        nestedScrollEnabled
-        ListEmptyComponent={
-          <Text style={styles.emptyListText}>No fines configured</Text>
-        }
-      />
-    </View>
-  );
-
-  // Render transactions content
-  const renderTransactionsContent = () => {
-    const pendingFines = transactions.filter(
-      (t) => t.type === "fine" && t.status === "pending"
-    );
-
-    const renderTransactionItem = ({ item }) => {
-      // Find the book for this transaction
-      const book = books.find((b) => b.id === item.bookId);
-
-      return (
-        <View style={styles.transactionItem}>
-          <View style={styles.transactionInfo}>
-            <Text style={styles.transactionTitle}>
-              {book ? book.title : "Unknown Book"}
-            </Text>
-            <Text style={styles.transactionDetail}>User ID: {item.userId}</Text>
-            <Text style={styles.transactionDetail}>
-              Days Overdue: {item.daysOverdue}
-            </Text>
-            <Text style={styles.transactionAmount}>
-              Fine Amount: ${item.amount.toFixed(2)}
-            </Text>
-            <Text style={styles.transactionDate}>
-              Created: {new Date(item.createdAt).toLocaleDateString()}
-            </Text>
-          </View>
-
-          <View style={styles.transactionActions}>
-            <TouchableOpacity
-              style={[styles.transactionAction, styles.resolveButton]}
-              onPress={() => handleResolveTransaction(item.id)}
-            >
-              <Feather name="check" size={18} color="#FFFFFF" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.transactionAction, styles.removeButton]}
-              onPress={() => handleRemoveTransaction(item.id)}
-            >
-              <Feather name="trash-2" size={18} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      );
-    };
-
-    return (
-      <View style={styles.transactionsContainer}>
-        <View style={styles.transactionsHeader}>
-          <Text style={styles.transactionsTitle}>Pending Fines</Text>
-          <TouchableOpacity
-            style={styles.checkOverdueButton}
-            onPress={checkOverdueBooks}
-          >
-            <Feather name="refresh-cw" size={18} color="#FFFFFF" />
-            <Text style={styles.checkOverdueButtonText}>Check Overdue</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.transactionsDescription}>
-          Automatically generated fines for overdue books.
-        </Text>
-
-        <FlatList
-          data={pendingFines}
-          keyExtractor={(item) => item.id}
-          renderItem={renderTransactionItem}
-          scrollEnabled={false}
-          nestedScrollEnabled
-          ListEmptyComponent={
-            <Text style={styles.emptyListText}>No pending fines</Text>
-          }
+  // Render the settings content
+  const renderSettingsContent = () => (
+    <View style={styles.settingsContainer}>
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Library Name*</Text>
+        <TextInput
+          style={styles.input}
+          value={libraryName}
+          onChangeText={(text) => {
+            setLibraryName(text);
+            setSettingsChanged(true);
+          }}
+          placeholder="Enter library name"
+          placeholderTextColor="#757575"
         />
       </View>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Description*</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          value={libraryDescription}
+          onChangeText={(text) => {
+            setLibraryDescription(text);
+            setSettingsChanged(true);
+          }}
+          placeholder="Enter library description"
+          placeholderTextColor="#757575"
+          multiline
+          numberOfLines={4}
+        />
+      </View>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Location*</Text>
+        <TextInput
+          style={styles.input}
+          value={libraryLocation}
+          onChangeText={(text) => {
+            setLibraryLocation(text);
+            setSettingsChanged(true);
+          }}
+          placeholder="Enter library location"
+          placeholderTextColor="#757575"
+        />
+      </View>
+
+      <View style={styles.formGroup}>
+        <Text style={styles.label}>Contact Information*</Text>
+        <TextInput
+          style={styles.input}
+          value={libraryContact}
+          onChangeText={(text) => {
+            setLibraryContact(text);
+            setSettingsChanged(true);
+          }}
+          placeholder="Enter contact information"
+          placeholderTextColor="#757575"
+        />
+      </View>
+
+      <View style={styles.formGroup}>
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Public Library</Text>
+          <Switch
+            value={isPublic}
+            onValueChange={(value) => {
+              setIsPublic(value);
+              setSettingsChanged(true);
+            }}
+            trackColor={{ false: "#1E1E1E", true: "#4568DC" }}
+            thumbColor={isPublic ? "#FFFFFF" : "#757575"}
+            ios_backgroundColor="#1E1E1E"
+          />
+        </View>
+        <Text style={styles.helperText}>{isPublic ? "Your library will be visible to all users" : "Your library will only be accessible via direct link or QR code"}</Text>
+      </View>
+
+      {settingsChanged && (
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={handleSaveSettings}
+        >
+          <LinearGradient
+            colors={["#4568DC", "#B06AB3"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gradientButton}
+          >
+            <Text style={styles.saveButtonText}>Save Changes</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator
+            size="large"
+            color="#B06AB3"
+          />
+          <Text style={styles.loadingText}>Loading library data...</Text>
+        </View>
+      </SafeAreaView>
     );
-  };
+  }
 
-  // Add transaction handling functions
-  const handleResolveTransaction = (transactionId) => {
-    Alert.alert("Resolve Fine", "Mark this fine as paid?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Resolve",
-        onPress: () => {
-          const updatedTransactions = transactions.map((transaction) => {
-            if (transaction.id === transactionId) {
-              return { ...transaction, status: "resolved" };
-            }
-            return transaction;
-          });
-
-          setTransactions(updatedTransactions);
-          Alert.alert("Success", "Fine marked as resolved");
-        },
-      },
-    ]);
-  };
-
-  const handleRemoveTransaction = (transactionId) => {
-    Alert.alert("Remove Fine", "Are you sure you want to remove this fine?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Remove",
-        style: "destructive",
-        onPress: () => {
-          const updatedTransactions = transactions.filter(
-            (transaction) => transaction.id !== transactionId
-          );
-
-          setTransactions(updatedTransactions);
-          Alert.alert("Success", "Fine removed successfully");
-        },
-      },
-    ]);
-  };
+  if (error) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => {
+              setError(null);
+              setLoading(true);
+              // Re-attempt loading data
+              const loadData = async () => {
+                try {
+                  await dataService.initializeDemoData();
+                  const libraries = await dataService.getLibraries();
+                  const currentLibrary = libraries.find((lib) => lib.id === libraryId);
+                  setLibrary(currentLibrary);
+                  const allBooks = await dataService.getBooks();
+                  const libraryBooks = allBooks.filter((book) => book.libraryId === libraryId);
+                  setBooks(libraryBooks);
+                  setError(null);
+                } catch (error) {
+                  setError("Failed to load library data. Please try again.");
+                } finally {
+                  setLoading(false);
+                }
+              };
+              loadData();
+            }}
+          >
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -904,106 +584,63 @@ const ManageLibraryScreen = ({ navigation, route }) => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Feather name="arrow-left" size={24} color="#FFFFFF" />
+          <Feather
+            name="arrow-left"
+            size={24}
+            color="#FFFFFF"
+          />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {library ? library.name : "Library Management"}
-        </Text>
+        <Text style={styles.headerTitle}>{library ? library.name : "Manage Library"}</Text>
       </View>
 
-      {/* Add a new tab for transactions in the tab container */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tab, activeTab === "books" && styles.activeTab]}
           onPress={() => setActiveTab("books")}
         >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "books" && styles.activeTabText,
-            ]}
-          >
-            Books
-          </Text>
+          <Text style={[styles.tabText, activeTab === "books" && styles.activeTabText]}>Books</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.tab, activeTab === "fines" && styles.activeTab]}
-          onPress={() => setActiveTab("fines")}
+          style={[styles.tab, activeTab === "settings" && styles.activeTab]}
+          onPress={() => setActiveTab("settings")}
         >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "fines" && styles.activeTabText,
-            ]}
-          >
-            Fines
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.tab, activeTab === "transactions" && styles.activeTab]}
-          onPress={() => setActiveTab("transactions")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "transactions" && styles.activeTabText,
-            ]}
-          >
-            Transactions
-          </Text>
+          <Text style={[styles.tabText, activeTab === "settings" && styles.activeTabText]}>Settings</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {activeTab === "books" ? (
+      <ScrollView style={styles.container}>
+        {activeTab === "books" && (
           <>
             <View style={styles.actionBar}>
               <TouchableOpacity
                 style={styles.addButton}
                 onPress={openBookAddModal}
-                disabled={loading}
               >
-                <Feather name="plus" size={18} color="#FFFFFF" />
-                <Text style={styles.addButtonText}>Add New Book</Text>
+                <Feather
+                  name="plus"
+                  size={16}
+                  color="#FFFFFF"
+                />
+                <Text style={styles.addButtonText}>Add Book</Text>
               </TouchableOpacity>
             </View>
 
-            {loading ? (
-              <View style={styles.loadingContainer}>
-                <Text style={styles.loadingText}>Loading...</Text>
-              </View>
-            ) : error ? (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-                <TouchableOpacity
-                  style={styles.retryButton}
-                  onPress={() => setError(null)}
-                >
-                  <Text style={styles.retryButtonText}>Retry</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
+            {books.length > 0 ? (
               <FlatList
                 data={books}
                 keyExtractor={(item) => item.id}
                 renderItem={renderBookItem}
                 scrollEnabled={false}
                 nestedScrollEnabled
-                ListEmptyComponent={
-                  <Text style={styles.emptyListText}>
-                    No books in the library
-                  </Text>
-                }
               />
+            ) : (
+              <Text style={styles.emptyListText}>No books in this library yet</Text>
             )}
           </>
-        ) : activeTab === "fines" ? (
-          renderFinesContent()
-        ) : (
-          renderTransactionsContent()
         )}
+
+        {activeTab === "settings" && renderSettingsContent()}
       </ScrollView>
 
       {/* Book Modal */}
@@ -1012,19 +649,17 @@ const ManageLibraryScreen = ({ navigation, route }) => {
         transparent={true}
         visible={bookModalVisible}
         onRequestClose={() => {
-          setBookModalVisible(false);
+          setBookModalVisible(!bookModalVisible);
           resetBookForm();
         }}
       >
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={styles.modalContainer}
         >
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {isEditMode ? "Edit Book" : "Add New Book"}
-              </Text>
+              <Text style={styles.modalTitle}>{isEditMode ? "Edit Book" : "Add New Book"}</Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => {
@@ -1032,74 +667,81 @@ const ManageLibraryScreen = ({ navigation, route }) => {
                   resetBookForm();
                 }}
               >
-                <Feather name="x" size={24} color="#FFFFFF" />
+                <Feather
+                  name="x"
+                  size={24}
+                  color="#FFFFFF"
+                />
               </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.modalForm}>
+              {isEditMode && hasBeenBorrowed(currentBook) && (
+                <View style={styles.warningBox}>
+                  <Feather
+                    name="alert-triangle"
+                    size={20}
+                    color="#FFD700"
+                  />
+                  <Text style={styles.warningText}>This book has been borrowed. Only description and cover image can be edited.</Text>
+                </View>
+              )}
+
               <View style={styles.formGroup}>
-                <Text style={styles.label}>Title*</Text>
+                <Text style={styles.label}>Title</Text>
                 <TextInput
                   style={styles.input}
                   value={bookTitle}
                   onChangeText={setBookTitle}
-                  placeholder="Book title"
+                  placeholder="Enter book title"
                   placeholderTextColor="#757575"
-                  editable={
-                    !(isEditMode && currentBook && hasBeenBorrowed(currentBook))
-                  }
+                  editable={!isEditMode || (isEditMode && !hasBeenBorrowed(currentBook))}
                 />
               </View>
 
               <View style={styles.formGroup}>
-                <Text style={styles.label}>Author*</Text>
+                <Text style={styles.label}>Author</Text>
                 <TextInput
                   style={styles.input}
                   value={bookAuthor}
                   onChangeText={setBookAuthor}
-                  placeholder="Author name"
+                  placeholder="Enter author name"
                   placeholderTextColor="#757575"
-                  editable={
-                    !(isEditMode && currentBook && hasBeenBorrowed(currentBook))
-                  }
+                  editable={!isEditMode || (isEditMode && !hasBeenBorrowed(currentBook))}
                 />
               </View>
 
               <View style={styles.formGroup}>
-                <Text style={styles.label}>ISBN*</Text>
+                <Text style={styles.label}>ISBN</Text>
                 <TextInput
                   style={styles.input}
                   value={bookIsbn}
                   onChangeText={setBookIsbn}
-                  placeholder="ISBN number"
+                  placeholder="Enter ISBN"
                   placeholderTextColor="#757575"
-                  editable={
-                    !(isEditMode && currentBook && hasBeenBorrowed(currentBook))
-                  }
+                  editable={!isEditMode || (isEditMode && !hasBeenBorrowed(currentBook))}
                 />
               </View>
 
               <View style={styles.formGroup}>
-                <Text style={styles.label}>Publisher*</Text>
+                <Text style={styles.label}>Publisher</Text>
                 <TextInput
                   style={styles.input}
                   value={bookPublisher}
                   onChangeText={setBookPublisher}
-                  placeholder="Publisher name"
+                  placeholder="Enter publisher"
                   placeholderTextColor="#757575"
-                  editable={
-                    !(isEditMode && currentBook && hasBeenBorrowed(currentBook))
-                  }
+                  editable={!isEditMode || (isEditMode && !hasBeenBorrowed(currentBook))}
                 />
               </View>
 
               <View style={styles.formGroup}>
-                <Text style={styles.label}>Description*</Text>
+                <Text style={styles.label}>Description</Text>
                 <TextInput
                   style={[styles.input, styles.textArea]}
                   value={bookDescription}
                   onChangeText={setBookDescription}
-                  placeholder="Book description"
+                  placeholder="Enter book description"
                   placeholderTextColor="#757575"
                   multiline
                   numberOfLines={4}
@@ -1112,36 +754,28 @@ const ManageLibraryScreen = ({ navigation, route }) => {
                   style={styles.input}
                   value={bookCoverImage}
                   onChangeText={setBookCoverImage}
-                  placeholder="https://example.com/image.jpg"
+                  placeholder="Enter cover image URL (optional)"
                   placeholderTextColor="#757575"
                 />
               </View>
 
               <View style={styles.formGroup}>
-                <Text style={styles.label}>Number of Copies*</Text>
+                <Text style={styles.label}>Number of Copies</Text>
                 <TextInput
                   style={styles.input}
                   value={bookCopiesCount}
                   onChangeText={setBookCopiesCount}
-                  placeholder="Number of copies"
+                  placeholder="Enter number of copies"
                   placeholderTextColor="#757575"
                   keyboardType="numeric"
+                  editable={!isEditMode || (isEditMode && getAvailableCopies(currentBook) === getTotalCopies(currentBook))}
                 />
+                {isEditMode && hasBeenBorrowed(currentBook) && <Text style={styles.helperText}>You can only increase the number of copies or maintain the current number.</Text>}
               </View>
-
-              {isEditMode && currentBook && hasBeenBorrowed(currentBook) && (
-                <View style={styles.warningBox}>
-                  <Feather name="alert-triangle" size={18} color="#FFD700" />
-                  <Text style={styles.warningText}>
-                    This book has been borrowed. Some fields cannot be edited.
-                  </Text>
-                </View>
-              )}
 
               <TouchableOpacity
                 style={styles.saveButton}
                 onPress={handleSaveBook}
-                disabled={loading}
               >
                 <LinearGradient
                   colors={["#4568DC", "#B06AB3"]}
@@ -1149,124 +783,7 @@ const ManageLibraryScreen = ({ navigation, route }) => {
                   end={{ x: 1, y: 0 }}
                   style={styles.gradientButton}
                 >
-                  <Text style={styles.saveButtonText}>
-                    {loading ? "Saving..." : "Save Book"}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
-
-      {/* Fine Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={fineModalVisible}
-        onRequestClose={() => {
-          setFineModalVisible(false);
-          resetFineForm();
-        }}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.modalContainer}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {isEditMode ? "Edit Fine" : "Add New Fine"}
-              </Text>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => {
-                  setFineModalVisible(false);
-                  resetFineForm();
-                }}
-              >
-                <Feather name="x" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.modalForm}>
-              <View style={styles.formGroup}>
-                <Text style={styles.label}>Fine Type*</Text>
-                <TextInput
-                  style={styles.input}
-                  value={fineType}
-                  onChangeText={setFineType}
-                  placeholder="e.g. Overdue, Damaged, Lost"
-                  placeholderTextColor="#757575"
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.label}>Amount ($)*</Text>
-                <TextInput
-                  style={styles.input}
-                  value={fineAmount}
-                  onChangeText={setFineAmount}
-                  placeholder="Fine amount"
-                  placeholderTextColor="#757575"
-                  keyboardType="numeric"
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.label}>Description*</Text>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  value={fineDescription}
-                  onChangeText={setFineDescription}
-                  placeholder="Fine description"
-                  placeholderTextColor="#757575"
-                  multiline
-                  numberOfLines={4}
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <View style={styles.switchContainer}>
-                  <Text style={styles.label}>Active</Text>
-                  <TouchableOpacity
-                    style={[
-                      styles.toggleSwitch,
-                      fineActive ? styles.toggleActive : styles.toggleInactive,
-                    ]}
-                    onPress={() => setFineActive(!fineActive)}
-                  >
-                    <View
-                      style={[
-                        styles.toggleHandle,
-                        fineActive
-                          ? styles.handleActive
-                          : styles.handleInactive,
-                      ]}
-                    />
-                  </TouchableOpacity>
-                </View>
-                <Text style={styles.helperText}>
-                  {fineActive
-                    ? "This fine is currently active"
-                    : "This fine is currently inactive"}
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={handleSaveFine}
-                disabled={loading}
-              >
-                <LinearGradient
-                  colors={["#4568DC", "#B06AB3"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.gradientButton}
-                >
-                  <Text style={styles.saveButtonText}>
-                    {loading ? "Saving..." : "Save Fine"}
-                  </Text>
+                  <Text style={styles.saveButtonText}>{isEditMode ? "Update Book" : "Add Book"}</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </ScrollView>
@@ -1404,108 +921,11 @@ const styles = StyleSheet.create({
     marginTop: 30,
     fontSize: 16,
   },
-  finesContainer: {
+  settingsContainer: {
     backgroundColor: "#1E1E1E",
     borderRadius: 15,
     padding: 20,
     marginTop: 10,
-  },
-  finesHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  finesTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-  },
-  finesDescription: {
-    fontSize: 14,
-    color: "#E0E0E0",
-    marginBottom: 20,
-  },
-  addFineButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#4568DC",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  addFineButtonText: {
-    color: "#FFFFFF",
-    marginLeft: 5,
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-  fineItem: {
-    backgroundColor: "#2A2A2A",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    flexDirection: "row",
-  },
-  fineInfo: {
-    flex: 1,
-  },
-  fineHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 5,
-  },
-  fineType: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-    marginRight: 8,
-  },
-  statusIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  activeStatus: {
-    backgroundColor: "#4CAF50",
-  },
-  inactiveStatus: {
-    backgroundColor: "#757575",
-  },
-  fineAmount: {
-    fontSize: 18,
-    color: "#B06AB3",
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  fineDescription: {
-    fontSize: 14,
-    color: "#E0E0E0",
-  },
-  fineActions: {
-    justifyContent: "space-around",
-  },
-  fineAction: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 5,
-  },
-  toggleButton: {
-    backgroundColor: "rgba(76, 175, 80, 0.2)",
-  },
-  manageFinesButton: {
-    backgroundColor: "#B06AB3",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  manageFinesButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
-    fontSize: 16,
   },
   loadingContainer: {
     alignItems: "center",
@@ -1515,6 +935,7 @@ const styles = StyleSheet.create({
   loadingText: {
     color: "#E0E0E0",
     fontSize: 16,
+    marginTop: 12,
   },
   errorContainer: {
     alignItems: "center",
@@ -1626,113 +1047,6 @@ const styles = StyleSheet.create({
     color: "#B0B0B0",
     fontSize: 14,
     marginTop: 4,
-  },
-  toggleSwitch: {
-    width: 50,
-    height: 28,
-    borderRadius: 14,
-    padding: 2,
-  },
-  toggleActive: {
-    backgroundColor: "#4568DC",
-  },
-  toggleInactive: {
-    backgroundColor: "#333333",
-  },
-  toggleHandle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#FFFFFF",
-  },
-  handleActive: {
-    transform: [{ translateX: 22 }],
-  },
-  handleInactive: {
-    transform: [{ translateX: 0 }],
-  },
-  transactionItem: {
-    backgroundColor: "#2A2A2A",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    flexDirection: "row",
-  },
-  transactionInfo: {
-    flex: 1,
-  },
-  transactionTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-    marginBottom: 5,
-  },
-  transactionDetail: {
-    fontSize: 14,
-    color: "#E0E0E0",
-    marginBottom: 2,
-  },
-  transactionAmount: {
-    fontSize: 16,
-    color: "#FF6B6B",
-    fontWeight: "bold",
-    marginTop: 5,
-    marginBottom: 2,
-  },
-  transactionDate: {
-    fontSize: 12,
-    color: "#B0B0B0",
-    marginTop: 5,
-  },
-  transactionActions: {
-    justifyContent: "space-around",
-  },
-  transactionAction: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 5,
-  },
-  resolveButton: {
-    backgroundColor: "rgba(76, 175, 80, 0.3)",
-  },
-  transactionsContainer: {
-    backgroundColor: "#1E1E1E",
-    borderRadius: 15,
-    padding: 20,
-    marginTop: 10,
-  },
-  transactionsHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  transactionsTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-  },
-  transactionsDescription: {
-    fontSize: 14,
-    color: "#E0E0E0",
-    marginBottom: 20,
-  },
-  checkOverdueButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#4568DC",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  checkOverdueButtonText: {
-    color: "#FFFFFF",
-    marginLeft: 5,
-    fontWeight: "bold",
-    fontSize: 14,
   },
 });
 

@@ -185,6 +185,69 @@
         }
       ],
       "reservedBy": []
+    },
+    {
+      "id": "book11",
+      "libraryId": "lib8",
+      "title": "The Innovator's Dilemma",
+      "author": "Clayton M. Christensen",
+      "isbn": "9780062060242",
+      "description": "The Revolutionary Book That Will Change the Way You Do Business",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": "user3",
+          "borrowDate": "2023-07-10T00:00:00.000Z",
+          "dueDate": "2023-07-24T00:00:00.000Z"
+        },
+        {
+          "id": 2,
+          "borrowedBy": null
+        }
+      ],
+      "reservedBy": ["user4"]
+    },
+    {
+      "id": "book12",
+      "libraryId": "lib8",
+      "title": "Zero to One",
+      "author": "Peter Thiel",
+      "isbn": "9780804139298",
+      "description": "Notes on Startups, or How to Build the Future",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": "user7",
+          "borrowDate": "2023-06-28T00:00:00.000Z",
+          "dueDate": "2023-07-12T00:00:00.000Z"
+        },
+        {
+          "id": 2,
+          "borrowedBy": "user1",
+          "borrowDate": "2023-07-05T00:00:00.000Z",
+          "dueDate": "2023-07-19T00:00:00.000Z"
+        }
+      ],
+      "reservedBy": []
+    },
+    {
+      "id": "book13",
+      "libraryId": "lib8",
+      "title": "The Lean Startup",
+      "author": "Eric Ries",
+      "isbn": "9780307887894",
+      "description": "How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": null
+        },
+        {
+          "id": 2,
+          "borrowedBy": null
+        }
+      ],
+      "reservedBy": ["user2", "user8"]
     }
   ]
 }

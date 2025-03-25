@@ -122,6 +122,181 @@
       "date": "2023-04-05T00:00:00.000Z",
       "amount": 1.0,
       "status": "active"
+    },
+    {
+      "id": "txn13",
+      "userId": "user3",
+      "bookId": "book11",
+      "copyId": 1,
+      "type": "borrow",
+      "date": "2023-07-10T00:00:00.000Z",
+      "amount": 4.5,
+      "status": "completed"
+    },
+    {
+      "id": "txn14",
+      "userId": "user7",
+      "bookId": "book12",
+      "copyId": 1,
+      "type": "borrow",
+      "date": "2023-06-28T00:00:00.000Z",
+      "amount": 5.0,
+      "status": "completed"
+    },
+    {
+      "id": "txn15",
+      "userId": "user1",
+      "bookId": "book12",
+      "copyId": 2,
+      "type": "borrow",
+      "date": "2023-07-05T00:00:00.000Z",
+      "amount": 5.0,
+      "status": "completed"
+    },
+    {
+      "id": "txn16",
+      "userId": "user4",
+      "bookId": "book11",
+      "copyId": 0,
+      "type": "reservation",
+      "date": "2023-07-15T00:00:00.000Z",
+      "amount": 1.0,
+      "status": "active"
+    },
+    {
+      "id": "txn17",
+      "userId": "user2",
+      "bookId": "book13",
+      "copyId": 0,
+      "type": "reservation",
+      "date": "2023-07-18T00:00:00.000Z",
+      "amount": 1.0,
+      "status": "active"
+    },
+    {
+      "id": "txn18",
+      "userId": "user8",
+      "bookId": "book13",
+      "copyId": 0,
+      "type": "reservation",
+      "date": "2023-07-19T00:00:00.000Z",
+      "amount": 1.0,
+      "status": "active"
+    },
+    {
+      "id": "txn19",
+      "userId": "user7",
+      "bookId": "book12",
+      "copyId": 1,
+      "type": "fine",
+      "date": "2023-07-15T00:00:00.000Z",
+      "amount": 1.5,
+      "status": "pending",
+      "reason": "overdue"
+    },
+    {
+      "id": "txn20",
+      "userId": "user2",
+      "bookId": "book9",
+      "copyId": 2,
+      "type": "borrow",
+      "date": "2023-07-01T00:00:00.000Z",
+      "amount": 4.5,
+      "status": "completed"
+    },
+    {
+      "id": "txn21",
+      "userId": "user2",
+      "bookId": "book9",
+      "copyId": 2,
+      "type": "fine",
+      "date": "2023-07-20T00:00:00.000Z",
+      "amount": 4.5,
+      "status": "pending",
+      "reason": "overdue"
+    },
+    {
+      "id": "txn22",
+      "userId": "user3",
+      "bookId": "book9",
+      "copyId": 3,
+      "type": "borrow",
+      "date": "2023-06-15T00:00:00.000Z",
+      "amount": 3.0,
+      "status": "completed"
+    },
+    {
+      "id": "txn23",
+      "userId": "user3",
+      "bookId": "book9",
+      "copyId": 3,
+      "type": "fine",
+      "date": "2023-07-05T00:00:00.000Z",
+      "amount": 5.0,
+      "status": "paid",
+      "reason": "damaged"
+    },
+    {
+      "id": "txn24",
+      "userId": "user1",
+      "bookId": "book9",
+      "copyId": 4,
+      "type": "borrow",
+      "date": "2023-07-10T00:00:00.000Z",
+      "amount": 3.5,
+      "status": "completed"
+    },
+    {
+      "id": "txn25",
+      "userId": "user1",
+      "bookId": "book9",
+      "copyId": 4,
+      "type": "fine",
+      "date": "2023-07-25T00:00:00.000Z",
+      "amount": 2.5,
+      "status": "pending",
+      "reason": "overdue"
+    },
+    {
+      "id": "txn26",
+      "userId": "user4",
+      "bookId": "book9",
+      "copyId": 5,
+      "type": "borrow",
+      "date": "2023-06-25T00:00:00.000Z",
+      "amount": 4.0,
+      "status": "completed"
+    },
+    {
+      "id": "txn27",
+      "userId": "user4",
+      "bookId": "book9",
+      "copyId": 5,
+      "type": "extension",
+      "date": "2023-07-08T00:00:00.000Z",
+      "amount": 2.0,
+      "status": "completed"
+    },
+    {
+      "id": "txn28",
+      "userId": "user6",
+      "bookId": "book9",
+      "copyId": 6,
+      "type": "borrow",
+      "date": "2023-07-05T00:00:00.000Z",
+      "amount": 3.5,
+      "status": "completed"
+    },
+    {
+      "id": "txn29",
+      "userId": "user6",
+      "bookId": "book9",
+      "copyId": 6,
+      "type": "fine",
+      "date": "2023-07-30T00:00:00.000Z",
+      "amount": 10.0,
+      "status": "pending",
+      "reason": "lost"
     }
   ]
 }

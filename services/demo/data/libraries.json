@@ -62,6 +62,15 @@
       "isPublic": false,
       "location": "404 University Street",
       "contact": "academic@example.com"
+    },
+    {
+      "id": "lib8",
+      "name": "Tech Innovation Collection",
+      "owner": "user5",
+      "description": "Modern technology and innovation books curated by Michael Chen",
+      "isPublic": true,
+      "location": "505 Innovation Street",
+      "contact": "m.chen@example.com"
     }
   ]
 }
