@@ -5,15 +5,81 @@ import { TabView, TabBar, SceneMap } from "react-native-tab-view";
 import { useWindowDimensions } from "react-native";
 
 const borrowedBooks = [
-    { title: "The Alchemist", returnDate: "Mar 24, 2024" },
-    { title: "Moby-Dick", returnDate: "Apr 10, 2024" },
-    { title: "War and Peace", returnDate: "May 05, 2024" },
+    {
+        id: "4",
+        title: "The Psychology of Money",
+        author: "Morgan Housel",
+        isbn: "9780857197689",
+        category: "Finance",
+        status: "available",
+        copies: 4,
+        availableCopies: 2,
+        returnDate: "Mar 24, 2024",
+        description: "Explores how people think about money and how emotions influence financial decisions."
+    },
+    {
+        id: "5",
+        title: "To Kill a Mockingbird",
+        author: "Harper Lee",
+        isbn: "9780061120084",
+        category: "Fiction",
+        status: "available",
+        copies: 6,
+        availableCopies: 4,
+        returnDate: "Mar 24, 2024",
+        description: "A Pulitzer Prize-winning novel that addresses serious social issues through a young girl's perspective."
+    },
+    {
+        id: "6",
+        title: "The Great Gatsby",
+        author: "F. Scott Fitzgerald",
+        isbn: "9780743273565",
+        category: "Fiction",
+        status: "available",
+        copies: 3,
+        availableCopies: 3,
+        returnDate: "Mar 24, 2024",
+        description: "A classic American novel that delves into themes of wealth, love, and the pursuit of the American Dream."
+    },
 ];
 
 const readedBooks = [
-    { title: "The Great Gatsby", readAt: "Mar 24, 2024" },
-    { title: "To Kill a Mockingbird", readAt: "Apr 10, 2024" },
-    { title: "1984", readAt: "May 05, 2024" },
+    {
+        id: "4",
+        title: "The Psychology of Money",
+        author: "Morgan Housel",
+        isbn: "9780857197689",
+        category: "Finance",
+        status: "available",
+        copies: 4,
+        availableCopies: 2,
+        readAt: "Mar 10, 2024",
+        description: "Explores how people think about money and how emotions influence financial decisions."
+    },
+    {
+        id: "5",
+        title: "To Kill a Mockingbird",
+        author: "Harper Lee",
+        isbn: "9780061120084",
+        category: "Fiction",
+        status: "available",
+        copies: 6,
+        availableCopies: 4,
+        readAt: "Mar 5, 2024",
+        description: "A Pulitzer Prize-winning novel that addresses serious social issues through a young girl's perspective."
+    },
+    {
+        id: "6",
+        title: "The Great Gatsby",
+        author: "F. Scott Fitzgerald",
+        isbn: "9780743273565",
+        category: "Fiction",
+        status: "available",
+        copies: 3,
+        availableCopies: 3,
+        readAt: "Mar 19, 2024",
+        description: "A classic American novel that delves into themes of wealth, love, and the pursuit of the American Dream."
+    },
 ];
 
 const BorrowedBooks = () => (
