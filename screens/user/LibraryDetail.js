@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, FlatList, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import dataService from "../../services/demo/dataService";
 
 const sampleLibraryDetails = {
     name: "City Central Library",
@@ -16,9 +17,10 @@ const sampleLibraryDetails = {
     ],
 };
 
-const LibraryDetailScreen = () => {
-    const { name, description, location, isPublic, books } = sampleLibraryDetails;
+const LibraryDetailScreen = ({ navigation, route }) => {
 
+    const { libraryId } = route.params;
+    const { getLibrary, getBooks } = dataService;
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>

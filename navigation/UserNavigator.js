@@ -10,7 +10,7 @@ const BookDetailScreen = importScreen("../screens/user/BookDetailScreen", "Book 
 const NotificationsScreen = importScreen("../screens/user/NotificationsScreen", "Notifications");
 const SearchResultsScreen = importScreen("../screens/user/SearchResultsScreen", "Search Results");
 const EditProfileScreen = importScreen("../screens/user/EditProfileScreen", "Edit Profile");
-import LibraryDetailScreen from "../screens/partner/LibraryDetail";
+import LibraryDetailScreen from "../screens/user/LibraryDetail";
 
 const UserNavigator = () => {
   return (

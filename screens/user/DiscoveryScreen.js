@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Alert, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { Camera } from "expo-camera";
+import { CameraView, Camera } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
 import storageService from "../../services/demo/dataService";
 
@@ -10,12 +10,14 @@ const DiscoveryScreen = ({ navigation }) => {
   const [libraries, setLibraries] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredLibraries, setFilteredLibraries] = useState([]);
-  const { initializeStorage, getLibraries } = storageService;
-
   const [cameraPermission, setCameraPermission] = useState(null);
   const [isScannerVisible, setScannerVisible] = useState(false);
+  const [scanned, setScanned] = useState(false);
+  const cameraRef = useRef(null);
+  const { initializeDemoData, getLibraries, getLibrary } = storageService;
 
   useEffect(() => {
+    requestCameraPermission();
     loadLibraries();
   }, []);
 
@@ -33,12 +35,46 @@ const DiscoveryScreen = ({ navigation }) => {
 
   const loadLibraries = async () => {
     try {
-      await initializeStorage();
+      await initializeDemoData();
       const data = await storageService.getLibraries();
       setLibraries(data);
       setFilteredLibraries(data);
     } catch (error) {
       console.error("Failed to load libraries:", error);
+    }
+  };
+
+  const requestCameraPermission = async () => {
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    setCameraPermission(status === "granted");
+  };
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    if (!scanned) {
+      setScanned(true);
+
+      // Add a delay to reset the scanned state to allow for multiple scans
+      setTimeout(() => {
+        setScanned(false);
+      }, 500);
+
+      setScannerVisible(false);
+      if (getLibrary(data) === null) {
+        Alert.alert("Library Not Found", "The scanned library does not exist.");
+        return;
+      }
+      // Navigate to the LibraryDetails screen with the scanned libraryId
+      navigation.navigate("LibraryDetails", { libraryId: data });
+    }
+  };
+
+  const toggleScanner = () => {
+    if (cameraPermission) {
+      setScannerVisible(!isScannerVisible);
+      // Reset the scanned state when the scanner is toggled
+      setScanned(false);
+    } else {
+      Alert.alert("Camera Permission", "Please grant camera access in settings.");
     }
   };
 
@@ -55,14 +91,7 @@ const DiscoveryScreen = ({ navigation }) => {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-          <TouchableOpacity
-            style={styles.scanButton}
-            onPress={() => {
-              if (cameraPermission === "granted") {
-                setScannerVisible(true);
-              }
-            }}
-          >
+          <TouchableOpacity style={styles.scanButton} onPress={toggleScanner}>
             <Ionicons name="qr-code" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -109,6 +138,23 @@ const DiscoveryScreen = ({ navigation }) => {
           <Text style={styles.createButtonText}>Lend Some Books</Text>
         </LinearGradient>
       </TouchableOpacity>
+
+      <Modal visible={isScannerVisible} animationType="slide" onRequestClose={toggleScanner}>
+        <View style={styles.scannerContainer}>
+          <CameraView
+            ref={cameraRef}
+            style={StyleSheet.absoluteFillObject}
+            facing="back"
+            onBarcodeScanned={handleBarCodeScanned}
+          >
+            <View style={styles.scannerOverlay}>
+              <TouchableOpacity style={styles.closeScannerButton} onPress={toggleScanner}>
+                <Text style={styles.closeScannerButtonText}>Close Scanner</Text>
+              </TouchableOpacity>
+            </View>
+          </CameraView>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -194,18 +240,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  scannerContainer: {
+    flex: 1,
+    backgroundColor: "#000",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  cameraView: {
+    width: "90%",
+    height: "70%",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  scannerOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
   closeScannerButton: {
-    position: "absolute",
-    bottom: 50,
-    alignSelf: "center",
     backgroundColor: "#8A2BE2",
     padding: 12,
     borderRadius: 8,
+    marginBottom: 40,
+    alignSelf: "center",
   },
   closeScannerButtonText: {
     color: "#FFFFFF",
     fontWeight: "bold",
   },
+
 });
 
 export default DiscoveryScreen;
