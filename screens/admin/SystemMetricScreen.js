@@ -224,6 +224,13 @@ const SystemMetricsScreen = ({ navigation }) => {
           >
             Server Config
           </Button>
+          <Button
+            mode="contained"
+            style={{ margin: 16 }}
+            onPress={() => navigation.navigate("StorageManager")}
+          >
+            Manage storage
+          </Button>
         </Card>
 
         <Text style={styles.versionText}>ManaLibrary Admin v1.0.0</Text>

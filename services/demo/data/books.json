@@ -1,0 +1,253 @@
+{
+  "books": [
+    {
+      "id": "book1",
+      "libraryId": "lib1",
+      "title": "Atomic Habits",
+      "author": "James Clear",
+      "isbn": "9781847941831",
+      "description": "Tiny Changes, Remarkable Results",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": "user3",
+          "borrowDate": "2023-04-10T00:00:00.000Z",
+          "dueDate": "2023-04-24T00:00:00.000Z"
+        },
+        {
+          "id": 2,
+          "borrowedBy": null
+        }
+      ],
+      "reservedBy": ["user2"]
+    },
+    {
+      "id": "book2",
+      "libraryId": "lib2",
+      "title": "Dune",
+      "author": "Frank Herbert",
+      "isbn": "9780441172719",
+      "description": "Science fiction novel",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": "user1",
+          "borrowDate": "2023-03-15T00:00:00.000Z",
+          "dueDate": "2023-03-29T00:00:00.000Z"
+        }
+      ],
+      "reservedBy": []
+    },
+    {
+      "id": "book3",
+      "libraryId": "lib3",
+      "title": "Clean Code",
+      "author": "Robert C. Martin",
+      "isbn": "9780132350884",
+      "description": "A Handbook of Agile Software Craftsmanship",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": null
+        }
+      ],
+      "reservedBy": []
+    },
+    {
+      "id": "book4",
+      "libraryId": "lib4",
+      "title": "Python Crash Course",
+      "author": "Eric Matthes",
+      "isbn": "9781593279288",
+      "description": "A Hands-On, Project-Based Introduction to Programming",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": "user7",
+          "borrowDate": "2023-07-05T00:00:00.000Z",
+          "dueDate": "2023-07-19T00:00:00.000Z"
+        },
+        {
+          "id": 2,
+          "borrowedBy": null
+        }
+      ],
+      "reservedBy": ["user8"]
+    },
+    {
+      "id": "book5",
+      "libraryId": "lib4",
+      "title": "The Pragmatic Programmer",
+      "author": "Andrew Hunt & David Thomas",
+      "isbn": "9780201616224",
+      "description": "From Journeyman to Master",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": null
+        }
+      ],
+      "reservedBy": []
+    },
+    {
+      "id": "book6",
+      "libraryId": "lib5",
+      "title": "Pride and Prejudice",
+      "author": "Jane Austen",
+      "isbn": "9780141439518",
+      "description": "A classic novel of manners",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": "user4",
+          "borrowDate": "2023-06-20T00:00:00.000Z",
+          "dueDate": "2023-07-04T00:00:00.000Z"
+        },
+        {
+          "id": 2,
+          "borrowedBy": null
+        },
+        {
+          "id": 3,
+          "borrowedBy": null
+        }
+      ],
+      "reservedBy": []
+    },
+    {
+      "id": "book7",
+      "libraryId": "lib5",
+      "title": "1984",
+      "author": "George Orwell",
+      "isbn": "9780451524935",
+      "description": "A dystopian novel set in a totalitarian society",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": null
+        },
+        {
+          "id": 2,
+          "borrowedBy": "user8",
+          "borrowDate": "2023-06-10T00:00:00.000Z",
+          "dueDate": "2023-06-24T00:00:00.000Z"
+        }
+      ],
+      "reservedBy": ["user3"]
+    },
+    {
+      "id": "book8",
+      "libraryId": "lib6",
+      "title": "The 7 Habits of Highly Effective People",
+      "author": "Stephen R. Covey",
+      "isbn": "9780743269513",
+      "description": "Powerful Lessons in Personal Change",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": null
+        }
+      ],
+      "reservedBy": []
+    },
+    {
+      "id": "book9",
+      "libraryId": "lib7",
+      "title": "A Brief History of Time",
+      "author": "Stephen Hawking",
+      "isbn": "9780553380163",
+      "description": "From the Big Bang to Black Holes",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": "user5",
+          "borrowDate": "2023-07-01T00:00:00.000Z",
+          "dueDate": "2023-07-15T00:00:00.000Z"
+        }
+      ],
+      "reservedBy": []
+    },
+    {
+      "id": "book10",
+      "libraryId": "lib2",
+      "title": "The Hitchhiker's Guide to the Galaxy",
+      "author": "Douglas Adams",
+      "isbn": "9780345391803",
+      "description": "A comedy science fiction series",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": null
+        },
+        {
+          "id": 2,
+          "borrowedBy": null
+        }
+      ],
+      "reservedBy": []
+    },
+    {
+      "id": "book11",
+      "libraryId": "lib8",
+      "title": "The Innovator's Dilemma",
+      "author": "Clayton M. Christensen",
+      "isbn": "9780062060242",
+      "description": "The Revolutionary Book That Will Change the Way You Do Business",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": "user3",
+          "borrowDate": "2023-07-10T00:00:00.000Z",
+          "dueDate": "2023-07-24T00:00:00.000Z"
+        },
+        {
+          "id": 2,
+          "borrowedBy": null
+        }
+      ],
+      "reservedBy": ["user4"]
+    },
+    {
+      "id": "book12",
+      "libraryId": "lib8",
+      "title": "Zero to One",
+      "author": "Peter Thiel",
+      "isbn": "9780804139298",
+      "description": "Notes on Startups, or How to Build the Future",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": "user7",
+          "borrowDate": "2023-06-28T00:00:00.000Z",
+          "dueDate": "2023-07-12T00:00:00.000Z"
+        },
+        {
+          "id": 2,
+          "borrowedBy": "user1",
+          "borrowDate": "2023-07-05T00:00:00.000Z",
+          "dueDate": "2023-07-19T00:00:00.000Z"
+        }
+      ],
+      "reservedBy": []
+    },
+    {
+      "id": "book13",
+      "libraryId": "lib8",
+      "title": "The Lean Startup",
+      "author": "Eric Ries",
+      "isbn": "9780307887894",
+      "description": "How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses",
+      "copies": [
+        {
+          "id": 1,
+          "borrowedBy": null
+        },
+        {
+          "id": 2,
+          "borrowedBy": null
+        }
+      ],
+      "reservedBy": ["user2", "user8"]
+    }
+  ]
+}

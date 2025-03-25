@@ -1,26 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, Pressable } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-
-// Demo admin credentials
-const ADMIN_CREDENTIALS = [
-  { account: "admin", password: "admin123", name: "John Admin" },
-  { account: "librarian", password: "lib123", name: "Sarah Librarian" },
-  { account: "superuser", password: "super123", name: "Mike Super" },
-];
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import dataService from "../../services/demo/dataService";
 
 const AdminLogin = ({ navigation }) => {
-  const [account, setAccount] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [demoUsers, setDemoUsers] = useState([]);
+
+  // Load demo users on component mount
+  useEffect(() => {
+    const loadDemoUsers = async () => {
+      try {
+        // Initialize demo data if not already done
+        await dataService.initializeDemoData();
+
+        // Get users from AsyncStorage
+        const usersJSON = await AsyncStorage.getItem(dataService.STORAGE_KEYS.USERS);
+        if (usersJSON) {
+          const users = JSON.parse(usersJSON);
+          setDemoUsers(users);
+        }
+      } catch (error) {
+        console.error("Failed to load demo users:", error);
+      }
+    };
+
+    loadDemoUsers();
+  }, []);
 
   const handleLogin = () => {
-    // Simple validation
-    if (!account || !password) {
+    // Basic validation
+    if (!email || !password) {
       Alert.alert("Error", "Please fill all fields");
       return;
     }
@@ -28,14 +45,49 @@ const AdminLogin = ({ navigation }) => {
     setIsLoading(true);
 
     // Simulate API call with timeout
-    setTimeout(() => {
-      // Check against demo credentials
-      const admin = ADMIN_CREDENTIALS.find((user) => user.account === account && user.password === password);
+    setTimeout(async () => {
+      // Check against users from demo data
+      const user = demoUsers.find(
+        (user) =>
+          user.email.toLowerCase() === email.toLowerCase() &&
+          // In a real app, you would hash and compare passwords
+          // For demo purposes, we'll assume the password is the first part of their email
+          password === email.split("@")[0]
+      );
 
       setIsLoading(false);
 
-      if (admin) {
-        Alert.alert("Success", `Welcome back, ${admin.name}!`, [{ text: "OK", onPress: () => navigation.replace("SystemMetrics") }]);
+      if (user) {
+        try {
+          // Save logged in user to AsyncStorage
+          await AsyncStorage.setItem(
+            dataService.STORAGE_KEYS.CURRENT_USER,
+            JSON.stringify({
+              id: user.id,
+              name: user.name,
+              role: user.role,
+            })
+          );
+
+          Alert.alert("Success", `Welcome back, ${user.name}!`, [
+            {
+              text: "OK",
+              onPress: () => {
+                // Navigate based on user role
+                if (user.role === "admin") {
+                  navigation.replace("SystemMetrics");
+                } else if (user.role === "partner") {
+                  navigation.replace("PartnerDashboard"); // Fixed typo from "ParnerDashboard"
+                } else {
+                  Alert.alert("Access Denied", "You don't have sufficient permissions");
+                }
+              },
+            },
+          ]);
+        } catch (error) {
+          console.error("Failed to save current user:", error);
+          Alert.alert("Error", "Login successful but failed to set user session");
+        }
       } else {
         Alert.alert("Error", "Invalid credentials");
       }
@@ -65,18 +117,19 @@ const AdminLogin = ({ navigation }) => {
           <View style={styles.formContainer}>
             <View style={styles.inputContainer}>
               <Ionicons
-                name="person"
+                name="mail"
                 size={24}
                 color="#B06AB3"
                 style={styles.inputIcon}
               />
               <TextInput
                 style={styles.input}
-                placeholder="Account"
+                placeholder="Email"
                 placeholderTextColor="#757575"
-                value={account}
-                onChangeText={setAccount}
+                value={email}
+                onChangeText={setEmail}
                 autoCapitalize="none"
+                keyboardType="email-address"
               />
             </View>
 
@@ -129,23 +182,18 @@ const AdminLogin = ({ navigation }) => {
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={styles.backButtonText}>Back to Home</Text>
-            </TouchableOpacity> */}
-
             <View style={styles.demoCredentials}>
               <Text style={styles.demoTitle}>Demo Credentials:</Text>
-              {ADMIN_CREDENTIALS.map((cred, index) => (
-                <Text
-                  key={index}
-                  style={styles.demoText}
-                >
-                  {cred.account} / {cred.password}
-                </Text>
-              ))}
+              {demoUsers
+                .filter((user) => user.role === "admin" || user.role === "partner")
+                .map((user, index) => (
+                  <Text
+                    key={index}
+                    style={styles.demoText}
+                  >
+                    {user.email} / {user.email.split("@")[0]} ({user.role})
+                  </Text>
+                ))}
             </View>
           </View>
         </View>
@@ -240,15 +288,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  backButton: {
-    alignItems: "center",
-    padding: 10,
-  },
-  backButtonText: {
-    color: "#B06AB3",
-    fontSize: 16,
-    textDecorationLine: "underline",
   },
   demoCredentials: {
     marginTop: 20,

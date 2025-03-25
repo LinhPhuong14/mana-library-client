@@ -1,0 +1,76 @@
+{
+  "libraries": [
+    {
+      "id": "lib1",
+      "name": "Community Library",
+      "owner": "user1",
+      "description": "A collection of books for everyone",
+      "isPublic": true,
+      "location": "123 Main Street",
+      "contact": "library@example.com"
+    },
+    {
+      "id": "lib2",
+      "name": "Science Fiction Collection",
+      "owner": "user2",
+      "description": "Sci-fi books for enthusiasts",
+      "isPublic": true,
+      "location": "456 Park Avenue",
+      "contact": "scifi@example.com"
+    },
+    {
+      "id": "lib3",
+      "name": "My Private Collection",
+      "owner": "user3",
+      "description": "Personal books I'm willing to lend",
+      "isPublic": false,
+      "location": "789 Elm Street",
+      "contact": "reader@example.com"
+    },
+    {
+      "id": "lib4",
+      "name": "Technology Books Hub",
+      "owner": "user5",
+      "description": "Programming and technology books for developers",
+      "isPublic": true,
+      "location": "101 Tech Boulevard",
+      "contact": "tech@example.com"
+    },
+    {
+      "id": "lib5",
+      "name": "Classic Literature Archive",
+      "owner": "user6",
+      "description": "A curated collection of literary classics",
+      "isPublic": true,
+      "location": "202 Literature Lane",
+      "contact": "classics@example.com"
+    },
+    {
+      "id": "lib6",
+      "name": "Self-Help Collection",
+      "owner": "user4",
+      "description": "Books for personal growth and development",
+      "isPublic": true,
+      "location": "303 Growth Avenue",
+      "contact": "growth@example.com"
+    },
+    {
+      "id": "lib7",
+      "name": "Academic Reference Library",
+      "owner": "user1",
+      "description": "Scholarly resources and academic publications",
+      "isPublic": false,
+      "location": "404 University Street",
+      "contact": "academic@example.com"
+    },
+    {
+      "id": "lib8",
+      "name": "Tech Innovation Collection",
+      "owner": "user5",
+      "description": "Modern technology and innovation books curated by Michael Chen",
+      "isPublic": true,
+      "location": "505 Innovation Street",
+      "contact": "m.chen@example.com"
+    }
+  ]
+}

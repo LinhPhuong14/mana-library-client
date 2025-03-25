@@ -1,0 +1,48 @@
+{
+  "books": {
+    "9786043751642": {
+      "title": "Đừng khóc ở Sài Gòn",
+      "author": "Xuân Thảo",
+      "publishedDate": "2022",
+      "description": "Sài Gòn thường được gọi là thành phố hoa lệ, hoa cho người giàu và lệ cho người nghèo. Nhịp sống ở thành phố này bao giờ cũng vội vã, tấp nập… nhưng với \"Đừng khóc ở Sài Gòn\", ta được chậm lại để cảm nhận một Sài Gòn thật lắng đọng và giàu chất thơ…",
+      "pageCount": 215,
+      "categories": ["Life", "Literature"],
+      "imageUrl": "https://cdn1.fahasa.com/media/catalog/product/8/9/8935325006562.jpg",
+      "language": "Vietnamese",
+      "publisher": "SkyBooks"
+    },
+    "9786043189216": {
+      "title": "Tiếng gọi từ vì sao xa",
+      "author": "Shinkai Makoto - Ooba Waku",
+      "publishedDate": "2021",
+      "description": "No description available.",
+      "pageCount": 1,
+      "categories": ["Novel", "Literature", "Romance"],
+      "imageUrl": "https://product.hstatic.net/200000287623/product/tieng-goi-tu-vi-sao-xa__1__d5764cee220b47ba94d49562e9443a72_master.jpg",
+      "language": "Vietnamese",
+      "publisher": "IPM"
+    },
+    "9786040230713": {
+      "title": "Xác suất thống kê",
+      "author": "PGS.TS. Tô Văn Ban",
+      "publishedDate": "2020",
+      "description": "Chương 1. Biến cố, xác suất biến cố; Chương 2. Biến ngẫu nhiên; Chương 3. Vectơ ngẫu nhiên; Chương 4. Thống kê; Chương 5. Mô hình hồi quy tuyến tính; Chương 6. Bài tập.",
+      "pageCount": 319,
+      "categories": ["Science", "Mathematics", "University"],
+      "imageUrl": "https://hfs1.duytan.edu.vn/upload/sach_anh/87803.jpg",
+      "language": "Vietnamese",
+      "publisher": "NXB Giáo dục Việt Nam - Hà Nội"
+    },
+    "9786046710554": {
+      "title": "Cơ sở công nghệ phần mềm",
+      "author": "Lương Mạnh Bá",
+      "published": "2018",
+      "description": "Tài liệu cung cấp những kiến thức cơ bản của lĩnh vực công nghệ phần mềm: các khái niệm, qui trình và các, mô hình chế tác phần mềm theo vòng đời phát triển phần mềm.Đối tượng chính của tài liệu này là sinh viên năm thứ 3 hay năm 4 ngành CNTT. Nó cũng hữu ích cho các kỹ sư muốn hiểu thêm các khái niệm, các qui trình chế tác theo các chuẩn của thế giới. Tài liệu gồm 6 phần với 13 chương. Phần 1 gồm 2 chương trình bày các khái niệm về phần mềm. Phần 2 dành cho tiến trình quản lý việc chế tác phần mềm- quản lý dự án phần mềm. Phần 3 trình bày giai đoạn đầu tiên của quá trình phát triển phần mềm. Phần 4 giới thiệu về quá trình thiết kế hệ thống. Phần 5 đề cập đến giai đoạn cuối cùng của qui trình chế tác phần mềm, kiểm thử và bảo trì. Phần 6 của giáo trình nhằm giới thiệu một số vấn đề cần quan tâm tìm hiểu thêm như: chuẩn ISO về chế tác phần mềm, mô hình và chuẩn CMMI, qui trình phát triển phần mềm hợp nhất -RUP",
+      "pageCount": 246,
+      "categories": ["Science", "Technology", "University", "Database"],
+      "imageUrl": "https://lib.caothang.edu.vn/book_images/25166.jpg",
+      "language": "Vietnamese",
+      "publisher": "NXB Khoa học kĩ thuật"
+    }
+  }
+}
