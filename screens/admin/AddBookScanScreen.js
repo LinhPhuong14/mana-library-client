@@ -219,10 +219,26 @@ const AddBookScanScreen = ({ navigation, route }) => {
   };
 
   const editManually = () => {
-    // Navigate to manual add/edit with pre-filled data
+    // Format the data from the scan to match what AddBookManual expects
+    const formattedBookData = {
+      title: bookData.title || "",
+      author: bookData.author || "",
+      isbn: bookData.isbn || "",
+      category: bookData.categories ? bookData.categories[0] : "Fiction",
+      copies: "1", // Default to 1 copy
+      description: bookData.description || "",
+      publisher: bookData.publisher || "",
+      publishedYear: bookData.publishedDate || "",
+      language: bookData.language === "en" ? "English" : bookData.language || "English",
+      pages: bookData.pageCount ? bookData.pageCount.toString() : "",
+      coverImage: bookData.imageUrl || null,
+    };
+
+    // Navigate to manual add/edit with properly formatted data
     navigation.navigate("AddBookManual", {
-      bookData,
-      libraryId, // Pass the libraryId to the manual screen
+      book: formattedBookData,
+      libraryId: libraryId,
+      isFromScan: true,
     });
   };
 

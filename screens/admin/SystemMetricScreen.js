@@ -1,38 +1,162 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card } from "react-native-paper";
+import { Card } from "react-native-paper";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import dataService from "../../services/demo/dataService";
 
 const SystemMetricsScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
-    totalBooks: 1237,
-    availableBooks: 956,
-    checkedOutBooks: 243,
-    reservedBooks: 38,
-    totalUsers: 428,
-    activeUsers: 312,
-    overdueBooks: 14,
-    newRegistrations: 17,
+    totalBooks: 0,
+    availableBooks: 0,
+    checkedOutBooks: 0,
+    reservedBooks: 0,
+    totalUsers: 0,
+    activeUsers: 0,
+    overdueBooks: 0,
+    newRegistrations: 0,
   });
 
-  const [recentActivities] = useState([
-    { id: "1", type: "book_checkout", user: "John Smith", book: "Atomic Habits", timestamp: "2 mins ago" },
-    { id: "2", type: "book_return", user: "Emma Johnson", book: "The Psychology of Money", timestamp: "15 mins ago" },
-    { id: "3", type: "new_user", user: "Michael Brown", timestamp: "34 mins ago" },
-    { id: "4", type: "reservation", user: "Sophia Williams", book: "Designing Data-Intensive Applications", timestamp: "1 hour ago" },
-    { id: "5", type: "book_checkout", user: "Robert Davis", book: "Clean Code", timestamp: "2 hours ago" },
-  ]);
+  const [recentActivities, setRecentActivities] = useState([]);
 
-  // Simulate loading data
-  const onRefresh = () => {
+  // Load data on component mount
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      // Initialize demo data if not already initialized
+      await dataService.initializeDemoData();
+
+      // Get books data
+      const books = await dataService.getBooks();
+
+      // Calculate book statistics
+      let availableCount = 0;
+      let checkedOutCount = 0;
+      let reservedCount = 0;
+      let overdueCount = 0;
+
+      const now = new Date();
+
+      books.forEach((book) => {
+        // Count reservations
+        if (book.reservedBy) {
+          reservedCount += book.reservedBy.length;
+        }
+
+        // Count copies and overdue books
+        if (book.copies) {
+          book.copies.forEach((copy) => {
+            if (copy.borrowedBy) {
+              checkedOutCount++;
+
+              // Check if overdue
+              if (copy.dueDate && new Date(copy.dueDate) < now) {
+                overdueCount++;
+              }
+            } else {
+              availableCount++;
+            }
+          });
+        }
+      });
+
+      // Get users data
+      const users = await dataService.getUsers();
+      const activeUsers = users.filter((user) => user.status === "active").length;
+
+      // Get recent transactions for activities
+      const transactions = await dataService.getTransactions();
+      const recentTransactions = transactions.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+
+      // Format transactions as activities
+      const activities = await Promise.all(
+        recentTransactions.map(async (tx) => {
+          const user = users.find((u) => u.id === tx.userId);
+          const book = books.find((b) => b.id === tx.bookId);
+
+          return {
+            id: tx.id,
+            type: mapTransactionTypeToActivity(tx.type),
+            user: user ? user.name : `User ${tx.userId}`,
+            book: book ? book.title : `Book ${tx.bookId}`,
+            timestamp: formatTimestamp(tx.date),
+          };
+        })
+      );
+
+      // Calculate new registrations (users from last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const newUsers = users.filter((user) => {
+        return user.memberSince && new Date(user.memberSince) > thirtyDaysAgo;
+      }).length;
+
+      // Update stats
+      setStats({
+        totalBooks: books.length,
+        availableBooks: availableCount,
+        checkedOutBooks: checkedOutCount,
+        reservedBooks: reservedCount,
+        totalUsers: users.length,
+        activeUsers,
+        overdueBooks: overdueCount,
+        newRegistrations: newUsers,
+      });
+
+      setRecentActivities(activities);
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Format timestamp relative to now (e.g., "2 mins ago")
+  const formatTimestamp = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return "just now";
+    if (diffMins < 60) return `${diffMins} min${diffMins === 1 ? "" : "s"} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+    if (diffDays < 30) return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+
+    return date.toLocaleDateString();
+  };
+
+  // Map transaction type to activity type
+  const mapTransactionTypeToActivity = (type) => {
+    switch (type) {
+      case "borrow":
+        return "book_checkout";
+      case "return":
+        return "book_return";
+      case "reservation":
+        return "reservation";
+      case "fine":
+        return "fine";
+      default:
+        return type;
+    }
+  };
+
+  // Refresh data
+  const onRefresh = async () => {
     setRefreshing(true);
-    // In a real app, this would fetch fresh data from the API
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1500);
+    await loadDashboardData();
+    setRefreshing(false);
   };
 
   // Activity icon based on type
@@ -68,6 +192,14 @@ const SystemMetricsScreen = ({ navigation }) => {
             name="bookmark"
             size={22}
             color="#f97316"
+          />
+        );
+      case "fine":
+        return (
+          <MaterialIcons
+            name="attach-money"
+            size={22}
+            color="#ef4444"
           />
         );
       default:
@@ -136,24 +268,19 @@ const SystemMetricsScreen = ({ navigation }) => {
         {/* Action Buttons */}
         <View style={styles.actionContainer}>
           <ActionButton
-            title="Manage Books"
-            icon="library-books"
-            onPress={() => navigation.navigate("ManageBooks")}
-          />
-          <ActionButton
             title="Manage Users"
             icon="people"
             onPress={() => navigation.navigate("ManageUsers")}
           />
-          {/* <ActionButton
+          <ActionButton
             title="Server Config"
             icon="settings"
             onPress={() => navigation.navigate("ServerConfig")}
-          /> */}
+          />
           <ActionButton
-            title="Manage Loans"
-            icon="receipt"
-            onPress={() => navigation.navigate("ManageLoans")}
+            title="Storage Manager"
+            icon="storage"
+            onPress={() => navigation.navigate("StorageManager")}
           />
         </View>
 
@@ -164,25 +291,32 @@ const SystemMetricsScreen = ({ navigation }) => {
             titleStyle={styles.cardTitle}
           />
           <Card.Content>
-            {recentActivities.map((activity) => (
-              <View
-                key={activity.id}
-                style={styles.activityItem}
-              >
-                <View style={styles.activityIconContainer}>{getActivityIcon(activity.type)}</View>
-                <View style={styles.activityContent}>
-                  <Text style={styles.activityText}>
-                    <Text style={styles.bold}>{activity.user}</Text>
-                    {activity.type === "book_checkout" && " checked out "}
-                    {activity.type === "book_return" && " returned "}
-                    {activity.type === "new_user" && " registered as a new user"}
-                    {activity.type === "reservation" && " reserved "}
-                    {(activity.type === "book_checkout" || activity.type === "book_return" || activity.type === "reservation") && <Text style={styles.bookTitle}>{activity.book}</Text>}
-                  </Text>
-                  <Text style={styles.timestamp}>{activity.timestamp}</Text>
+            {recentActivities.length > 0 ? (
+              recentActivities.map((activity, index) => (
+                <View
+                  key={activity.id || index}
+                  style={styles.activityItem}
+                >
+                  <View style={styles.activityIconContainer}>{getActivityIcon(activity.type)}</View>
+                  <View style={styles.activityContent}>
+                    <Text style={styles.activityText}>
+                      <Text style={styles.bold}>{activity.user}</Text>
+                      {activity.type === "book_checkout" && " checked out "}
+                      {activity.type === "book_return" && " returned "}
+                      {activity.type === "new_user" && " registered as a new user"}
+                      {activity.type === "reservation" && " reserved "}
+                      {activity.type === "fine" && " was charged a fine for "}
+                      {(activity.type === "book_checkout" || activity.type === "book_return" || activity.type === "reservation" || activity.type === "fine") && (
+                        <Text style={styles.bookTitle}>{activity.book}</Text>
+                      )}
+                    </Text>
+                    <Text style={styles.timestamp}>{activity.timestamp}</Text>
+                  </View>
                 </View>
-              </View>
-            ))}
+              ))
+            ) : (
+              <Text style={styles.emptyText}>No recent activities found</Text>
+            )}
           </Card.Content>
         </Card>
 
@@ -216,21 +350,6 @@ const SystemMetricsScreen = ({ navigation }) => {
               <Text style={styles.statusText}>64% used (3.2/5GB)</Text>
             </View>
           </Card.Content>
-          {/* Server config button */}
-          <Button
-            mode="contained"
-            style={{ margin: 16 }}
-            onPress={() => navigation.navigate("ServerConfig")}
-          >
-            Server Config
-          </Button>
-          <Button
-            mode="contained"
-            style={{ margin: 16 }}
-            onPress={() => navigation.navigate("StorageManager")}
-          >
-            Manage storage
-          </Button>
         </Card>
 
         <Text style={styles.versionText}>ManaLibrary Admin v1.0.0</Text>
@@ -435,6 +554,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 16,
     fontSize: 12,
+  },
+  emptyText: {
+    color: "#757575",
+    textAlign: "center",
+    padding: 12,
+    fontSize: 14,
   },
 });
 

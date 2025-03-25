@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator, FlatList, Modal, Pressable } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator, FlatList, Modal, Pressable, Dimensions, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -9,6 +9,9 @@ import storageService from "../../services/demo/dataService";
 import { Platform } from "react-native";
 
 const StorageManagerScreen = ({ navigation }) => {
+  const { width, height } = useWindowDimensions();
+  const isPortrait = height > width;
+
   const [storageKeys, setStorageKeys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedKey, setSelectedKey] = useState(null);
@@ -16,11 +19,19 @@ const StorageManagerScreen = ({ navigation }) => {
   const [editData, setEditData] = useState("");
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState("keys"); // 'keys' or 'data'
 
   // Load all AsyncStorage keys
   useEffect(() => {
     loadStorageKeys();
   }, []);
+
+  // Update active tab when a key is selected in portrait mode
+  useEffect(() => {
+    if (selectedKey && isPortrait) {
+      setActiveTab("data");
+    }
+  }, [selectedKey, isPortrait]);
 
   const loadStorageKeys = async () => {
     try {
@@ -94,6 +105,9 @@ const StorageManagerScreen = ({ navigation }) => {
             if (selectedKey === key) {
               setSelectedKey(null);
               setKeyData(null);
+              if (isPortrait) {
+                setActiveTab("keys");
+              }
             }
             await loadStorageKeys();
             Alert.alert("Success", `Key ${key} deleted successfully`);
@@ -122,6 +136,7 @@ const StorageManagerScreen = ({ navigation }) => {
             await loadStorageKeys();
             setSelectedKey(null);
             setKeyData(null);
+            setActiveTab("keys");
             Alert.alert("Success", "All data has been reset to demo defaults");
           } catch (error) {
             console.error("Failed to reset data:", error);
@@ -149,7 +164,13 @@ const StorageManagerScreen = ({ navigation }) => {
             size={24}
             color={isSystemKey ? "#4568DC" : "#B06AB3"}
           />
-          <Text style={styles.keyText}>{item}</Text>
+          <Text
+            style={styles.keyText}
+            numberOfLines={1}
+            ellipsizeMode="middle"
+          >
+            {item}
+          </Text>
         </View>
         <TouchableOpacity
           style={styles.deleteButton}
@@ -164,6 +185,35 @@ const StorageManagerScreen = ({ navigation }) => {
       </TouchableOpacity>
     );
   };
+
+  // Tab navigation component for portrait mode
+  const TabNavigation = () => (
+    <View style={styles.tabContainer}>
+      <TouchableOpacity
+        style={[styles.tab, activeTab === "keys" && styles.activeTab]}
+        onPress={() => setActiveTab("keys")}
+      >
+        <MaterialIcons
+          name="list"
+          size={20}
+          color={activeTab === "keys" ? "#FFFFFF" : "#B06AB3"}
+        />
+        <Text style={[styles.tabText, activeTab === "keys" && styles.activeTabText]}>Storage Keys</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.tab, activeTab === "data" && styles.activeTab]}
+        onPress={() => setActiveTab("data")}
+        disabled={!selectedKey}
+      >
+        <MaterialIcons
+          name="data-usage"
+          size={20}
+          color={activeTab === "data" ? "#FFFFFF" : "#B06AB3"}
+        />
+        <Text style={[styles.tabText, activeTab === "data" && styles.activeTabText]}>{selectedKey ? "View Data" : "Select a Key"}</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -194,62 +244,139 @@ const StorageManagerScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.contentContainer}>
-        {/* Storage Keys List */}
-        <View style={styles.keysContainer}>
-          <Text style={styles.sectionTitle}>Storage Keys</Text>
-          {loading && !keyData ? (
-            <ActivityIndicator
-              size="large"
-              color="#B06AB3"
-            />
-          ) : (
-            <FlatList
-              data={storageKeys}
-              renderItem={renderKeyItem}
-              keyExtractor={(item) => item}
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              ListEmptyComponent={<Text style={styles.emptyText}>No storage keys found</Text>}
-            />
+      {/* Portrait mode: Tab Navigation */}
+      {isPortrait && <TabNavigation />}
+
+      {/* Content layout changes based on orientation */}
+      {isPortrait ? (
+        // Portrait Layout (Tabbed)
+        <View style={styles.portraitContentContainer}>
+          {/* Keys Tab */}
+          {activeTab === "keys" && (
+            <View style={styles.fullWidthContainer}>
+              {loading && !keyData ? (
+                <ActivityIndicator
+                  size="large"
+                  color="#B06AB3"
+                  style={styles.loader}
+                />
+              ) : (
+                <FlatList
+                  data={storageKeys}
+                  renderItem={renderKeyItem}
+                  keyExtractor={(item) => item}
+                  refreshing={refreshing}
+                  onRefresh={handleRefresh}
+                  contentContainerStyle={styles.keysList}
+                  ListEmptyComponent={<Text style={styles.emptyText}>No storage keys found</Text>}
+                />
+              )}
+            </View>
           )}
-        </View>
 
-        {/* Key Data View */}
-        <View style={styles.dataContainer}>
-          <View style={styles.dataHeader}>
-            <Text style={styles.sectionTitle}>{selectedKey ? `Data: ${selectedKey}` : "Select a key to view data"}</Text>
-            {selectedKey && (
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => setEditModalVisible(true)}
-              >
-                <Text style={styles.editButtonText}>Edit</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          {/* Data Tab */}
+          {activeTab === "data" && (
+            <View style={styles.fullWidthContainer}>
+              <View style={styles.dataHeader}>
+                <Text
+                  style={styles.sectionTitle}
+                  numberOfLines={1}
+                  ellipsizeMode="middle"
+                >
+                  {selectedKey ? selectedKey : "Select a key to view data"}
+                </Text>
+                {selectedKey && (
+                  <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={() => setEditModalVisible(true)}
+                  >
+                    <Text style={styles.editButtonText}>Edit</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
 
-          {loading && selectedKey ? (
-            <ActivityIndicator
-              size="large"
-              color="#B06AB3"
-            />
-          ) : keyData ? (
-            <ScrollView style={styles.dataScrollView}>
-              <Text style={styles.dataText}>{JSON.stringify(JSON.parse(keyData), null, 2)}</Text>
-            </ScrollView>
-          ) : (
-            <View style={styles.noDataContainer}>
-              <MaterialIcons
-                name="storage"
-                size={60}
-                color="#2A2A2A"
-              />
-              <Text style={styles.noDataText}>Select a storage key to view its data</Text>
+              {loading && selectedKey ? (
+                <ActivityIndicator
+                  size="large"
+                  color="#B06AB3"
+                  style={styles.loader}
+                />
+              ) : keyData ? (
+                <ScrollView style={styles.dataScrollView}>
+                  <Text style={styles.dataText}>{JSON.stringify(JSON.parse(keyData), null, 2)}</Text>
+                </ScrollView>
+              ) : (
+                <View style={styles.noDataContainer}>
+                  <MaterialIcons
+                    name="storage"
+                    size={60}
+                    color="#2A2A2A"
+                  />
+                  <Text style={styles.noDataText}>Select a storage key to view its data</Text>
+                </View>
+              )}
             </View>
           )}
         </View>
-      </View>
+      ) : (
+        // Landscape Layout (Side by Side)
+        <View style={styles.contentContainer}>
+          {/* Storage Keys List */}
+          <View style={styles.keysContainer}>
+            <Text style={styles.sectionTitle}>Storage Keys</Text>
+            {loading && !keyData ? (
+              <ActivityIndicator
+                size="large"
+                color="#B06AB3"
+              />
+            ) : (
+              <FlatList
+                data={storageKeys}
+                renderItem={renderKeyItem}
+                keyExtractor={(item) => item}
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                ListEmptyComponent={<Text style={styles.emptyText}>No storage keys found</Text>}
+              />
+            )}
+          </View>
+
+          {/* Key Data View */}
+          <View style={styles.dataContainer}>
+            <View style={styles.dataHeader}>
+              <Text style={styles.sectionTitle}>{selectedKey ? `Data: ${selectedKey}` : "Select a key to view data"}</Text>
+              {selectedKey && (
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => setEditModalVisible(true)}
+                >
+                  <Text style={styles.editButtonText}>Edit</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {loading && selectedKey ? (
+              <ActivityIndicator
+                size="large"
+                color="#B06AB3"
+              />
+            ) : keyData ? (
+              <ScrollView style={styles.dataScrollView}>
+                <Text style={styles.dataText}>{JSON.stringify(JSON.parse(keyData), null, 2)}</Text>
+              </ScrollView>
+            ) : (
+              <View style={styles.noDataContainer}>
+                <MaterialIcons
+                  name="storage"
+                  size={60}
+                  color="#2A2A2A"
+                />
+                <Text style={styles.noDataText}>Select a storage key to view its data</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      )}
 
       {/* Bottom Action Buttons */}
       <View style={styles.actionButtonsContainer}>
@@ -355,12 +482,50 @@ const styles = StyleSheet.create({
   refreshButton: {
     padding: 8,
   },
+  // Tab navigation styles
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#1A1A1A",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#2A2A2A",
+  },
+  tab: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  activeTab: {
+    backgroundColor: "#4568DC",
+  },
+  tabText: {
+    color: "#B06AB3",
+    marginLeft: 8,
+    fontWeight: "500",
+  },
+  activeTabText: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+  },
+  // Responsive layout containers
   contentContainer: {
     flex: 1,
     flexDirection: "row",
   },
+  portraitContentContainer: {
+    flex: 1,
+  },
+  fullWidthContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+  },
   keysContainer: {
-    width: "35%",
+    width: "40%",
     borderRightWidth: 1,
     borderRightColor: "#2A2A2A",
     padding: 12,
@@ -369,17 +534,21 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 12,
   },
+  keysList: {
+    paddingBottom: 16,
+  },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#B06AB3",
     marginBottom: 12,
+    flex: 1,
   },
   keyItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 12,
     backgroundColor: "#1E1E1E",
     borderRadius: 8,
@@ -399,9 +568,10 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     marginLeft: 8,
     fontSize: 14,
+    flex: 1,
   },
   deleteButton: {
-    padding: 4,
+    padding: 6,
   },
   dataHeader: {
     flexDirection: "row",
@@ -411,9 +581,10 @@ const styles = StyleSheet.create({
   },
   editButton: {
     backgroundColor: "#2A2A2A",
-    paddingVertical: 4,
+    paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 4,
+    marginLeft: 8,
   },
   editButtonText: {
     color: "#4568DC",
@@ -434,6 +605,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    minHeight: 200,
   },
   noDataText: {
     color: "#757575",
@@ -532,6 +704,9 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
+  },
+  loader: {
+    marginTop: 20,
   },
 });
 

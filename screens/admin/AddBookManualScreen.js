@@ -5,27 +5,33 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
+import dataService from "../../services/demo/dataService";
 
 // Book categories
 const CATEGORIES = ["Fiction", "Non-Fiction", "Technology", "Science", "History", "Biography", "Self-Help", "Business", "Finance", "Memoir", "Other"];
 
 const AddBookManualScreen = ({ navigation, route }) => {
-  // Check if editing an existing book
+  // Check if editing an existing book or coming from scan
   const isEditing = route.params?.isEditing || false;
+  const isFromScan = route.params?.isFromScan || false;
   const existingBook = route.params?.book || {};
 
+  // Extract libraryId from route params
+  const libraryId = route.params?.libraryId;
+
+  // Initialize state based on whether we're editing, coming from scan, or creating new
   const [bookData, setBookData] = useState({
-    title: isEditing ? existingBook.title : "",
-    author: isEditing ? existingBook.author : "",
-    isbn: isEditing ? existingBook.isbn : "",
-    category: isEditing ? existingBook.category : "Fiction",
-    copies: isEditing ? existingBook.copies.toString() : "1",
-    description: isEditing ? existingBook.description || "" : "",
-    publisher: isEditing ? existingBook.publisher || "" : "",
-    publishedYear: isEditing ? existingBook.publishedYear || "" : "",
-    language: isEditing ? existingBook.language || "English" : "English",
-    pages: isEditing ? existingBook.pages?.toString() || "" : "",
-    coverImage: isEditing ? existingBook.coverImage || null : null,
+    title: isEditing || isFromScan ? existingBook.title : "",
+    author: isEditing || isFromScan ? existingBook.author : "",
+    isbn: isEditing || isFromScan ? existingBook.isbn : route.params?.isbn || "",
+    category: isEditing || isFromScan ? existingBook.category : "Fiction",
+    copies: isEditing || isFromScan ? existingBook.copies?.toString() || "1" : "1",
+    description: isEditing || isFromScan ? existingBook.description || "" : "",
+    publisher: isEditing || isFromScan ? existingBook.publisher || "" : "",
+    publishedYear: isEditing || isFromScan ? existingBook.publishedYear || "" : "",
+    language: isEditing || isFromScan ? existingBook.language || "English" : "English",
+    pages: isEditing || isFromScan ? existingBook.pages?.toString() || "" : "",
+    coverImage: isEditing || isFromScan ? existingBook.coverImage || null : null,
   });
 
   const [loading, setLoading] = useState(false);
@@ -89,19 +95,75 @@ const AddBookManualScreen = ({ navigation, route }) => {
   };
 
   // Handle save
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateForm()) return;
 
     setLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Create copies array
+      const copies = [];
+      const copiesCount = parseInt(bookData.copies) || 1;
+
+      for (let i = 1; i <= copiesCount; i++) {
+        copies.push({
+          id: i,
+          borrowedBy: null,
+          borrowDate: null,
+          dueDate: null,
+        });
+      }
+
+      // Prepare book data for saving
+      const newBook = {
+        id: isEditing ? existingBook.id : Date.now().toString(),
+        libraryId: libraryId, // Associate with the library
+        title: bookData.title,
+        author: bookData.author,
+        isbn: bookData.isbn,
+        publisher: bookData.publisher,
+        publishedYear: bookData.publishedYear,
+        description: bookData.description,
+        category: bookData.category,
+        language: bookData.language,
+        pages: bookData.pages ? parseInt(bookData.pages) : null,
+        coverImage: bookData.coverImage,
+        copies: copies,
+        reservedBy: isEditing ? existingBook.reservedBy || [] : [],
+      };
+
+      // Save to storage
+      if (isEditing) {
+        await dataService.updateBook(newBook.id, newBook);
+      } else {
+        await dataService.addBook(newBook);
+      }
+
+      // Success message
       setLoading(false);
-      Alert.alert("Success", isEditing ? "Book updated successfully" : "Book added successfully", [{ text: "OK", onPress: () => navigation.goBack() }]);
-    }, 1500);
+
+      Alert.alert("Success", isEditing ? "Book updated successfully" : "Book added successfully", [
+        {
+          text: "OK",
+          onPress: () => {
+            if (libraryId) {
+              // If we have a libraryId, navigate to the library management screen
+              navigation.navigate("ManageLibrary", { libraryId });
+            } else {
+              // Otherwise just go back
+              navigation.goBack();
+            }
+          },
+        },
+      ]);
+    } catch (error) {
+      setLoading(false);
+      Alert.alert("Error", "Failed to save book. Please try again.");
+      console.error("Error saving book:", error);
+    }
   };
 
-  // Render category item
+  // Rest of the component remains the same
   const renderCategoryItem = ({ item }) => {
     return (
       <Pressable

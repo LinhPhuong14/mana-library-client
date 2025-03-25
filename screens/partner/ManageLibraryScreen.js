@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Switch, ActivityIndicator, SafeAreaView, Modal, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Switch, ActivityIndicator, SafeAreaView, Modal, ScrollView, Platform, StatusBar } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import dataService from "../../services/demo/dataService";
@@ -431,6 +431,7 @@ const ManageLibraryScreen = ({ navigation, route }) => {
   if (loading) {
     return (
       <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="light-content" />
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"
@@ -445,6 +446,7 @@ const ManageLibraryScreen = ({ navigation, route }) => {
   if (error) {
     return (
       <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="light-content" />
         <View style={styles.errorContainer}>
           <Feather
             name="alert-circle"
@@ -465,6 +467,7 @@ const ManageLibraryScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" />
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -514,12 +517,17 @@ const ManageLibraryScreen = ({ navigation, route }) => {
             data={books}
             renderItem={renderBookItem}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.container}
+            contentContainerStyle={styles.listContainer}
             ListEmptyComponent={() => <Text style={styles.emptyListText}>No books added to this library yet. Click the "Add Book" button to get started.</Text>}
           />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.container}>{renderSettingsContent()}</ScrollView>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={false}
+        >
+          {renderSettingsContent()}
+        </ScrollView>
       )}
 
       {/* Book Modal here */}
@@ -532,15 +540,18 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#121212",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 20,
-    paddingBottom: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    marginTop: 5,
   },
   backButton: {
     marginRight: 15,
+    padding: 5,
   },
   headerTitle: {
     fontSize: 24,
@@ -551,12 +562,16 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
   },
+  listContainer: {
+    padding: 20,
+    paddingTop: 0,
+  },
   tabContainer: {
     flexDirection: "row",
     marginHorizontal: 20,
     borderRadius: 8,
     backgroundColor: "#1E1E1E",
-    marginBottom: 10,
+    marginBottom: 15,
   },
   tab: {
     flex: 1,
@@ -578,12 +593,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     marginBottom: 15,
+    paddingBottom: 5,
   },
   addButton: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#4568DC",
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 8,
   },
@@ -662,6 +678,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   loadingContainer: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 30,
@@ -672,6 +689,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   errorContainer: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 30,
