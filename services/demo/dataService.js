@@ -15,6 +15,7 @@ const STORAGE_KEYS = {
   DEMO: "demo_data",
   // special key for the current user
   CURRENT_USER: "mana_current_user",
+  CONVERSATIONS: "mana_conversations",
 };
 
 export const initializeDemoData = async () => {
@@ -40,6 +41,61 @@ export const initializeDemoData = async () => {
     console.error("Error initializing demo data:", error);
     return false;
   }
+};
+
+// CRUD operations for chat conversations
+export const getConversations = async (userId = null) => {
+  const data = await AsyncStorage.getItem(STORAGE_KEYS.CONVERSATIONS);
+  const conversations = JSON.parse(data) || [];
+
+  if (userId) {
+    return conversations.filter((conv) => conv.userId === userId);
+  }
+  return conversations;
+};
+
+export const getConversation = async (conversationId) => {
+  const conversations = await getConversations();
+  return conversations.find((conv) => conv.id === conversationId);
+};
+
+export const addConversation = async (conversation) => {
+  const conversations = await getConversations();
+  const newConversation = {
+    id: conversation.id || Date.now().toString(),
+    createdAt: conversation.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    messages: conversation.messages || [],
+    title: conversation.title || "New Conversation",
+    ...conversation,
+  };
+
+  conversations.push(newConversation);
+  await AsyncStorage.setItem(STORAGE_KEYS.CONVERSATIONS, JSON.stringify(conversations));
+  return newConversation;
+};
+
+export const updateConversation = async (conversationId, updates) => {
+  const conversations = await getConversations();
+  const index = conversations.findIndex((conv) => conv.id === conversationId);
+
+  if (index !== -1) {
+    conversations[index] = {
+      ...conversations[index],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+    await AsyncStorage.setItem(STORAGE_KEYS.CONVERSATIONS, JSON.stringify(conversations));
+    return conversations[index];
+  }
+  return null;
+};
+
+export const deleteConversation = async (conversationId) => {
+  const conversations = await getConversations();
+  const updatedConversations = conversations.filter((conv) => conv.id !== conversationId);
+  await AsyncStorage.setItem(STORAGE_KEYS.CONVERSATIONS, JSON.stringify(updatedConversations));
+  return updatedConversations;
 };
 
 // CRUD operations for libraries
@@ -418,4 +474,9 @@ export default {
   addFine,
   updateFine,
   payFine,
+  getConversations,
+  getConversation,
+  addConversation,
+  updateConversation,
+  deleteConversation,
 };

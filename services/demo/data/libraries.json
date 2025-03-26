@@ -7,7 +7,8 @@
       "description": "A collection of books for everyone",
       "isPublic": true,
       "location": "123 Main Street",
-      "contact": "library@example.com"
+      "contact": "library@example.com",
+      "views": 218
     },
     {
       "id": "lib2",
@@ -16,7 +17,8 @@
       "description": "Sci-fi books for enthusiasts",
       "isPublic": true,
       "location": "456 Park Avenue",
-      "contact": "scifi@example.com"
+      "contact": "scifi@example.com",
+      "views": 230
     },
     {
       "id": "lib3",
@@ -25,7 +27,8 @@
       "description": "Personal books I'm willing to lend",
       "isPublic": false,
       "location": "789 Elm Street",
-      "contact": "reader@example.com"
+      "contact": "reader@example.com",
+      "views": 17
     },
     {
       "id": "lib4",
@@ -34,7 +37,8 @@
       "description": "Programming and technology books for developers",
       "isPublic": true,
       "location": "101 Tech Boulevard",
-      "contact": "tech@example.com"
+      "contact": "tech@example.com",
+      "views": 99
     },
     {
       "id": "lib5",
@@ -43,7 +47,8 @@
       "description": "A curated collection of literary classics",
       "isPublic": true,
       "location": "202 Literature Lane",
-      "contact": "classics@example.com"
+      "contact": "classics@example.com",
+      "views": 49
     },
     {
       "id": "lib6",
@@ -52,7 +57,8 @@
       "description": "Books for personal growth and development",
       "isPublic": true,
       "location": "303 Growth Avenue",
-      "contact": "growth@example.com"
+      "contact": "growth@example.com",
+      "views": 123
     },
     {
       "id": "lib7",
@@ -61,7 +67,8 @@
       "description": "Scholarly resources and academic publications",
       "isPublic": false,
       "location": "404 University Street",
-      "contact": "academic@example.com"
+      "contact": "academic@example.com",
+      "views": 12
     },
     {
       "id": "lib8",
@@ -70,7 +77,8 @@
       "description": "Modern technology and innovation books curated by Michael Chen",
       "isPublic": true,
       "location": "505 Innovation Street",
-      "contact": "m.chen@example.com"
+      "contact": "m.chen@example.com",
+      "views": 407
     }
   ]
 }

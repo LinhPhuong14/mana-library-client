@@ -203,11 +203,24 @@ const PartnerDashboardScreen = ({ navigation }) => {
   const handleActivityPress = (item) => {
     try {
       if (item.type === "borrow" || item.type === "return") {
-        // If we have copy information, navigate to the borrower details
-        if (item.copyId && item.userId) {
+        // If we have all required information, navigate to borrower details
+        if (item.copyId && item.userId && item.bookId) {
           navigateToViewBorrower(item.userId, item.bookId, item.copyId);
+        } else if (item.userId && item.bookId) {
+          // If copyId is missing, try to find it from the book's copies
+          const book = books.find((b) => b.id === item.bookId);
+          if (book && book.copies) {
+            // Find a copy borrowed by this user
+            const copy = book.copies.find((c) => c.borrowedBy === item.userId);
+            if (copy) {
+              navigateToViewBorrower(item.userId, item.bookId, copy.id);
+              return;
+            }
+          }
+          // If we still can't determine the copyId, navigate to the book in the library
+          Alert.alert("Incomplete Information", "Cannot view complete borrower details. Navigating to library management instead.");
+          navigateToManageLibrary(item.libraryId, "books");
         } else {
-          // Otherwise just navigate to the book in the library
           navigateToManageLibrary(item.libraryId, "books");
         }
       } else if (item.type === "payment") {

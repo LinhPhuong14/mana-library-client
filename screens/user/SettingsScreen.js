@@ -1,157 +1,295 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, TouchableOpacity } from "react-native";
-import Slider from "@react-native-community/slider";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Switch } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
+import dataService from "../../services/demo/dataService";
 
 const SettingsScreen = ({ navigation }) => {
-    const [fontSize, setFontSize] = useState(16);
-    const [language, setLanguage] = useState("English");
+  const [darkMode, setDarkMode] = useState(true);
+  const [notifications, setNotifications] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    const handleLogout = () => {
-        navigation.navigate("Splash");
-        // Add your logout logic here
+  // Check login status when component mounts
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const userData = await AsyncStorage.getItem(dataService.STORAGE_KEYS.CURRENT_USER);
+        setIsLoggedIn(userData !== null);
+      } catch (error) {
+        console.error("Error checking login status:", error);
+      }
     };
 
-    return (
-        <SafeAreaView style={styles.safeArea}>
-            <View style={styles.container}>
-                <Text style={styles.header}>Settings</Text>
+    checkLoginStatus();
+  }, []);
 
-                {/* Language Selection */}
-                <View style={styles.card}>
-                    <Text style={styles.sectionTitle}>Language</Text>
-                    <View style={styles.languageContainer}>
-                        {["English", "Spanish", "French", "German"].map((lang) => (
-                            <TouchableOpacity
-                                key={lang}
-                                style={[
-                                    styles.languageButton,
-                                    language === lang ? styles.selectedLanguage : {},
-                                ]}
-                                onPress={() => setLanguage(lang)}
-                            >
-                                <Text
-                                    style={
-                                        language === lang
-                                            ? styles.selectedLanguageText
-                                            : styles.languageText
-                                    }
-                                >
-                                    {lang}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </View>
+  const handleLogout = async () => {
+    try {
+      // Show confirmation dialog
+      Alert.alert("Logout", "Are you sure you want to log out?", [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: async () => {
+            // Clear user data from AsyncStorage
+            await AsyncStorage.removeItem(dataService.STORAGE_KEYS.CURRENT_USER);
+            setIsLoggedIn(false);
 
-                {/* Font Size Adjustment */}
-                <View style={styles.card}>
-                    <Text style={styles.sectionTitle}>Font Size</Text>
-                    <View style={styles.sliderContainer}>
-                        <Slider
-                            style={styles.slider}
-                            minimumValue={12}
-                            maximumValue={24}
-                            step={1}
-                            value={fontSize}
-                            onValueChange={setFontSize}
-                            minimumTrackTintColor="#636ae8"
-                            maximumTrackTintColor="#ccc"
-                            thumbTintColor="#636ae8"
-                        />
-                        <Text style={styles.fontSizeText}>{fontSize}px</Text>
-                    </View>
-                </View>
+            // Navigate to the Auth stack, Login screen
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Auth", params: { screen: "Login" } }],
+            });
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error("Error during logout:", error);
+      Alert.alert("Error", "Failed to log out. Please try again.");
+    }
+  };
 
-                {/* Logout Button */}
-                <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                    <Text style={styles.logoutText}>Logout</Text>
-                </TouchableOpacity>
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.header}>Settings</Text>
+
+        <Text style={styles.infoText}>Some features are still under development and will be available soon.</Text>
+
+        {/* App Settings */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>App Settings</Text>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingLabelContainer}>
+              <Ionicons
+                name="moon-outline"
+                size={22}
+                color="#B06AB3"
+                style={styles.settingIcon}
+              />
+              <Text style={styles.settingLabel}>Dark Mode</Text>
+              <Text style={styles.comingSoonTag}>Coming Soon</Text>
             </View>
-        </SafeAreaView>
-    );
+            <Switch
+              value={darkMode}
+              onValueChange={setDarkMode}
+              trackColor={{ false: "#767577", true: "#4568DC" }}
+              thumbColor={darkMode ? "#B06AB3" : "#f4f3f4"}
+              disabled={true}
+            />
+          </View>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingLabelContainer}>
+              <Ionicons
+                name="notifications-outline"
+                size={22}
+                color="#B06AB3"
+                style={styles.settingIcon}
+              />
+              <Text style={styles.settingLabel}>Push Notifications</Text>
+              <Text style={styles.comingSoonTag}>Coming Soon</Text>
+            </View>
+            <Switch
+              value={notifications}
+              onValueChange={setNotifications}
+              trackColor={{ false: "#767577", true: "#4568DC" }}
+              thumbColor={notifications ? "#B06AB3" : "#f4f3f4"}
+              disabled={true}
+            />
+          </View>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingLabelContainer}>
+              <Ionicons
+                name="language-outline"
+                size={22}
+                color="#B06AB3"
+                style={styles.settingIcon}
+              />
+              <Text style={styles.settingLabel}>Language</Text>
+              <Text style={styles.comingSoonTag}>Coming Soon</Text>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={22}
+              color="#515151"
+            />
+          </View>
+        </View>
+
+        {/* Account */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Account</Text>
+
+          {isLoggedIn && (
+            <TouchableOpacity
+              style={styles.settingButton}
+              onPress={() => navigation.navigate("EditProfile")}
+            >
+              <View style={styles.settingLabelContainer}>
+                <Ionicons
+                  name="person-outline"
+                  size={22}
+                  color="#B06AB3"
+                  style={styles.settingIcon}
+                />
+                <Text style={styles.settingLabel}>Edit Profile</Text>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={22}
+                color="#757575"
+              />
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity
+            style={styles.settingButton}
+            onPress={() => Alert.alert("Help & Support", "This feature will be available soon!")}
+          >
+            <View style={styles.settingLabelContainer}>
+              <Ionicons
+                name="help-circle-outline"
+                size={22}
+                color="#B06AB3"
+                style={styles.settingIcon}
+              />
+              <Text style={styles.settingLabel}>Help & Support</Text>
+              <Text style={styles.comingSoonTag}>Coming Soon</Text>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={22}
+              color="#515151"
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.settingButton}
+            onPress={() => Alert.alert("About", "Mana Library v1.0\n© 2025 Mana Library Team")}
+          >
+            <View style={styles.settingLabelContainer}>
+              <Ionicons
+                name="information-circle-outline"
+                size={22}
+                color="#B06AB3"
+                style={styles.settingIcon}
+              />
+              <Text style={styles.settingLabel}>About</Text>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={22}
+              color="#757575"
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Logout Button - Only show if logged in */}
+        {isLoggedIn && (
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={handleLogout}
+          >
+            <Ionicons
+              name="log-out-outline"
+              size={20}
+              color="#FFFFFF"
+            />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: "#121212",
-    },
-    container: {
-        flex: 1,
-        padding: 20,
-    },
-    header: {
-        fontSize: 24,
-        fontWeight: "bold",
-        color: "#FFFFFF",
-        marginBottom: 20,
-    },
-    card: {
-        backgroundColor: "#1E1E1E",
-        padding: 15,
-        borderRadius: 15,
-        marginBottom: 15,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: "#FFFFFF",
-        marginBottom: 10,
-    },
-    languageContainer: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "space-between",
-        marginTop: 10,
-    },
-    languageButton: {
-        padding: 10,
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: "#636ae8",
-        marginBottom: 5,
-        width: "48%",
-        alignItems: "center",
-    },
-    selectedLanguage: {
-        backgroundColor: "#636ae8",
-    },
-    languageText: {
-        color: "#636ae8",
-        fontWeight: "bold",
-    },
-    selectedLanguageText: {
-        color: "#FFFFFF",
-        fontWeight: "bold",
-    },
-    sliderContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-    },
-    slider: {
-        flex: 1,
-        height: 40,
-    },
-    fontSizeText: {
-        fontSize: 16,
-        fontWeight: "bold",
-        color: "#FFFFFF",
-        marginLeft: 10,
-    },
-    logoutButton: {
-        backgroundColor: "#e63946",
-        padding: 12,
-        borderRadius: 8,
-        alignItems: "center",
-        marginTop: 20,
-    },
-    logoutText: {
-        color: "#FFFFFF",
-        fontSize: 18,
-        fontWeight: "bold",
-    },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#121212",
+  },
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    marginBottom: 8,
+  },
+  infoText: {
+    color: "#AAAAAA",
+    fontSize: 14,
+    marginBottom: 20,
+    fontStyle: "italic",
+  },
+  card: {
+    backgroundColor: "#1E1E1E",
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 15,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    marginBottom: 16,
+  },
+  settingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.1)",
+  },
+  settingButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.1)",
+  },
+  settingLabelContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  settingIcon: {
+    marginRight: 12,
+  },
+  settingLabel: {
+    fontSize: 16,
+    color: "#FFFFFF",
+  },
+  comingSoonTag: {
+    fontSize: 12,
+    color: "#B06AB3",
+    marginLeft: 8,
+    fontStyle: "italic",
+  },
+  logoutButton: {
+    backgroundColor: "#e63946",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  logoutText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 8,
+  },
 });
 
 export default SettingsScreen;

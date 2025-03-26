@@ -1,17 +1,59 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, Pressable } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, Pressable, ActivityIndicator } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useAuth } from "../../context/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import dataService from "../../services/demo/dataService";
 
 const LoginScreen = ({ navigation }) => {
-  const { login, error, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [demoUsers, setDemoUsers] = useState([]);
+
+  // Load demo users on component mount and clear current user
+  useEffect(() => {
+    const initializeScreen = async () => {
+      try {
+        // Clear the current user data when loading the login screen
+        await AsyncStorage.removeItem(dataService.STORAGE_KEYS.CURRENT_USER);
+
+        // Initialize demo data if not already done
+        await dataService.initializeDemoData();
+
+        // Get users from AsyncStorage, filter to only regular users (not admins)
+        const users = await dataService.getUsers();
+        const regularUsers = users.filter((user) => user.role === "user" || user.role === "partner");
+        setDemoUsers(regularUsers);
+      } catch (error) {
+        console.error("Failed to initialize login screen:", error);
+      }
+    };
+
+    initializeScreen();
+  }, []);
+
+  // Load demo users on component mount
+  useEffect(() => {
+    const loadDemoUsers = async () => {
+      try {
+        // Initialize demo data if not already done
+        await dataService.initializeDemoData();
+
+        // Get users from AsyncStorage, filter to only regular users (not admins)
+        const users = await dataService.getUsers();
+        const regularUsers = users.filter((user) => user.role === "user" || user.role === "partner");
+        setDemoUsers(regularUsers);
+      } catch (error) {
+        console.error("Failed to load demo users:", error);
+      }
+    };
+
+    loadDemoUsers();
+  }, []);
 
   const handleLogin = () => {
     // Basic validation
@@ -22,11 +64,65 @@ const LoginScreen = ({ navigation }) => {
 
     setIsLoading(true);
 
-    // Simulate API call with timeout for login
-    setTimeout(() => {
-      login({ email, password });
-      setIsLoading(false);
-      navigation.replace("User");
+    // Simulate API call with timeout
+    setTimeout(async () => {
+      try {
+        // Get all users to check credentials
+        const allUsers = await dataService.getUsers();
+        const user = allUsers.find(
+          (user) =>
+            user.email.toLowerCase() === email.toLowerCase() &&
+            // In a real app, you would hash and compare passwords
+            // For demo purposes, we're using the part before @ in the email as password
+            password === email.split("@")[0]
+        );
+
+        setIsLoading(false);
+
+        if (!user) {
+          Alert.alert("Error", "Invalid credentials");
+          return;
+        }
+
+        // If admin tries to log in here, redirect to admin login
+        if (user.role === "admin") {
+          Alert.alert("Admin Account", "Please use the Admin Login section to access administrator features.", [
+            {
+              text: "OK",
+              onPress: () => {
+                // Optionally navigate to admin login
+                // navigation.navigate("AdminLogin");
+              },
+            },
+          ]);
+          return;
+        }
+
+        // Save logged in user to AsyncStorage
+        await AsyncStorage.setItem(
+          dataService.STORAGE_KEYS.CURRENT_USER,
+          JSON.stringify({
+            id: user.id,
+            name: user.name,
+            role: user.role,
+            email: user.email,
+          })
+        );
+
+        Alert.alert("Success", `Welcome back, ${user.name}!`, [
+          {
+            text: "OK",
+            onPress: () => {
+              // Navigate to appropriate screen for user or partner
+              navigation.replace("User", { screen: "Home" });
+            },
+          },
+        ]);
+      } catch (error) {
+        setIsLoading(false);
+        console.error("Login error:", error);
+        Alert.alert("Error", "Something went wrong. Please try again.");
+      }
     }, 1000);
   };
 
@@ -65,6 +161,7 @@ const LoginScreen = ({ navigation }) => {
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
+                autoCapitalize="none"
               />
             </View>
 
@@ -106,7 +203,14 @@ const LoginScreen = ({ navigation }) => {
                 end={{ x: 1, y: 0 }}
                 style={styles.loginButton}
               >
-                <Text style={styles.loginButtonText}>{isLoading ? "Loading..." : "Login"}</Text>
+                {isLoading ? (
+                  <ActivityIndicator
+                    size="small"
+                    color="#FFFFFF"
+                  />
+                ) : (
+                  <Text style={styles.loginButtonText}>Login</Text>
+                )}
               </LinearGradient>
             </TouchableOpacity>
 
@@ -125,6 +229,19 @@ const LoginScreen = ({ navigation }) => {
               >
                 <Text style={styles.signUpButtonText}>Sign Up</Text>
               </TouchableOpacity>
+            </View>
+
+            {/* Demo Credentials Section - only show non-admin users */}
+            <View style={styles.demoCredentials}>
+              <Text style={styles.demoTitle}>Demo Credentials:</Text>
+              {demoUsers.slice(0, 3).map((user, index) => (
+                <Text
+                  key={index}
+                  style={styles.demoText}
+                >
+                  {user.email} / {user.email.split("@")[0]} ({user.role})
+                </Text>
+              ))}
             </View>
           </View>
         </View>
@@ -231,6 +348,24 @@ const styles = StyleSheet.create({
   signUpButtonText: {
     color: "#6970e4",
     fontSize: 14,
+  },
+  demoCredentials: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: "#4568DC",
+  },
+  demoTitle: {
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: "#B06AB3",
+  },
+  demoText: {
+    fontSize: 14,
+    color: "#FFFFFF",
+    marginBottom: 4,
   },
 });
 

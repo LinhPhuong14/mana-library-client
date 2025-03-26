@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Switch, ActivityIndicator, SafeAreaView, Modal, ScrollView, Platform, StatusBar } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Switch, ActivityIndicator, SafeAreaView, Modal, ScrollView, Platform, StatusBar, Alert } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import dataService from "../../services/demo/dataService";
@@ -212,7 +212,7 @@ const ManageLibraryScreen = ({ navigation, route }) => {
     }
   };
 
-  // Handle remove book
+  // Handle remove book with confirmation
   const handleRemoveBook = async (bookId) => {
     try {
       const book = books.find((b) => b.id === bookId);
@@ -222,10 +222,26 @@ const ManageLibraryScreen = ({ navigation, route }) => {
         return;
       }
 
-      await dataService.deleteBook(bookId);
-
-      // Update local state
-      setBooks(books.filter((book) => book.id !== bookId));
+      // Add confirmation dialog before deleting
+      Alert.alert("Confirm Deletion", `Are you sure you want to remove "${book.title}" from your library?`, [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await dataService.deleteBook(bookId);
+              // Update local state
+              setBooks(books.filter((book) => book.id !== bookId));
+            } catch (err) {
+              alert(`Error: ${err.message}`);
+            }
+          },
+        },
+      ]);
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
@@ -502,7 +518,7 @@ const ManageLibraryScreen = ({ navigation, route }) => {
           <View style={[styles.container, styles.actionBar]}>
             <TouchableOpacity
               style={styles.addButton}
-              onPress={navigateToScanBook}
+              onPress={openBookAddModal}
             >
               <Feather
                 name="plus"
@@ -510,6 +526,17 @@ const ManageLibraryScreen = ({ navigation, route }) => {
                 color="#FFFFFF"
               />
               <Text style={styles.addButtonText}>Add Book</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.addButton, { marginLeft: 10 }]}
+              onPress={navigateToScanBook}
+            >
+              <Feather
+                name="camera"
+                size={16}
+                color="#FFFFFF"
+              />
+              <Text style={styles.addButtonText}>Scan Book</Text>
             </TouchableOpacity>
           </View>
 
@@ -530,8 +557,128 @@ const ManageLibraryScreen = ({ navigation, route }) => {
         </ScrollView>
       )}
 
-      {/* Book Modal here */}
-      {/* ... */}
+      {/* Book Modal */}
+      <Modal
+        visible={bookModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setBookModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{isEditMode ? "Edit Book" : "Add Book"}</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setBookModalVisible(false)}
+              >
+                <Feather
+                  name="x"
+                  size={24}
+                  color="#FFFFFF"
+                />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalForm}>
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Title*</Text>
+                <TextInput
+                  style={styles.input}
+                  value={bookTitle}
+                  onChangeText={setBookTitle}
+                  placeholder="Enter book title"
+                  placeholderTextColor="#757575"
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Author*</Text>
+                <TextInput
+                  style={styles.input}
+                  value={bookAuthor}
+                  onChangeText={setBookAuthor}
+                  placeholder="Enter author name"
+                  placeholderTextColor="#757575"
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>ISBN</Text>
+                <TextInput
+                  style={styles.input}
+                  value={bookIsbn}
+                  onChangeText={setBookIsbn}
+                  placeholder="Enter ISBN (optional)"
+                  placeholderTextColor="#757575"
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Publisher</Text>
+                <TextInput
+                  style={styles.input}
+                  value={bookPublisher}
+                  onChangeText={setBookPublisher}
+                  placeholder="Enter publisher (optional)"
+                  placeholderTextColor="#757575"
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Description</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  value={bookDescription}
+                  onChangeText={setBookDescription}
+                  placeholder="Enter book description (optional)"
+                  placeholderTextColor="#757575"
+                  multiline
+                  numberOfLines={4}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Number of Copies*</Text>
+                <TextInput
+                  style={styles.input}
+                  value={bookCopiesCount}
+                  onChangeText={setBookCopiesCount}
+                  placeholder="Enter number of copies"
+                  placeholderTextColor="#757575"
+                  keyboardType="numeric"
+                />
+              </View>
+
+              {isEditMode && currentBook && hasBeenBorrowed(currentBook) && (
+                <View style={styles.warningBox}>
+                  <Feather
+                    name="alert-triangle"
+                    size={20}
+                    color="#FFD700"
+                  />
+                  <Text style={styles.warningText}>This book has been borrowed. You cannot reduce the number of copies below the number currently borrowed.</Text>
+                </View>
+              )}
+
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleSaveBook}
+              >
+                <LinearGradient
+                  colors={["#4568DC", "#B06AB3"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.gradientButton}
+                >
+                  <Text style={styles.saveButtonText}>{isEditMode ? "Update Book" : "Add Book"}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

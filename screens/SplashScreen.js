@@ -1,12 +1,15 @@
 import React, { useState, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import dataService from "../services/demo/dataService";
 
 const SplashScreen = ({ navigation }) => {
   const [isLogoPressed, setIsLogoPressed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const timerRef = useRef(null);
 
   const handleLogoPress = () => {
@@ -25,6 +28,20 @@ const SplashScreen = ({ navigation }) => {
   const handleLogoRelease = () => {
     clearTimeout(timerRef.current);
     setIsLogoPressed(false);
+  };
+
+  const handleGuestAccess = async () => {
+    try {
+      setIsLoading(true);
+      // Clear only current user data for a clean guest experience
+      await AsyncStorage.removeItem(dataService.STORAGE_KEYS.CURRENT_USER);
+      // Navigate to User route
+      navigation.navigate("User");
+    } catch (error) {
+      console.error("Error clearing user data:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -64,9 +81,17 @@ const SplashScreen = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.guestButton}
-          onPress={() => navigation.navigate("User")}
+          onPress={handleGuestAccess}
+          disabled={isLoading}
         >
-          <Text style={styles.guestText}>Browse as Guest</Text>
+          {isLoading ? (
+            <ActivityIndicator
+              size="small"
+              color="#B06AB3"
+            />
+          ) : (
+            <Text style={styles.guestText}>Browse as Guest</Text>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -76,6 +101,7 @@ const SplashScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  // ...existing styles remain unchanged
   container: {
     flex: 1,
     backgroundColor: "#121212",
@@ -126,6 +152,8 @@ const styles = StyleSheet.create({
   },
   guestButton: {
     paddingVertical: 10,
+    minWidth: 100,
+    alignItems: "center",
   },
   guestText: {
     color: "#B06AB3",

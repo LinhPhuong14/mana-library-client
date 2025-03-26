@@ -6,7 +6,13 @@
       "title": "Atomic Habits",
       "author": "James Clear",
       "isbn": "9781847941831",
-      "description": "Tiny Changes, Remarkable Results",
+      "description": "Tiny Changes, Remarkable Results. No matter your goals, Atomic Habits offers a proven framework for improving--every day. James Clear, one of the world's leading experts on habit formation, reveals practical strategies that will teach you exactly how to form good habits, break bad ones, and master the tiny behaviors that lead to remarkable results.",
+      "category": "Self-Help",
+      "publisher": "Random House Business",
+      "publishYear": 2018,
+      "language": "English",
+      "pages": 320,
+      "coverImage": "https://m.media-amazon.com/images/I/51-nXsSRfZL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -27,7 +33,13 @@
       "title": "Dune",
       "author": "Frank Herbert",
       "isbn": "9780441172719",
-      "description": "Science fiction novel",
+      "description": "Set on the desert planet Arrakis, Dune is the story of the boy Paul Atreides, heir to a noble family tasked with ruling an inhospitable world where the only thing of value is the \"spice\" melange, a drug capable of extending life and enhancing consciousness. When his family is betrayed, the destruction of Paul's family will set the boy on a journey toward a destiny greater than he could ever have imagined.",
+      "category": "Science Fiction",
+      "publisher": "Ace Books",
+      "publishYear": 1965,
+      "language": "English",
+      "pages": 688,
+      "coverImage": "https://m.media-amazon.com/images/I/41+L9Q-qVgL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -44,7 +56,13 @@
       "title": "Clean Code",
       "author": "Robert C. Martin",
       "isbn": "9780132350884",
-      "description": "A Handbook of Agile Software Craftsmanship",
+      "description": "Even bad code can function. But if code isn't clean, it can bring a development organization to its knees. Every year, countless hours and significant resources are lost because of poorly written code. But it doesn't have to be that way.",
+      "category": "Programming",
+      "publisher": "Prentice Hall",
+      "publishYear": 2008,
+      "language": "English",
+      "pages": 464,
+      "coverImage": "https://m.media-amazon.com/images/I/41xShlnTZTL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -59,7 +77,13 @@
       "title": "Python Crash Course",
       "author": "Eric Matthes",
       "isbn": "9781593279288",
-      "description": "A Hands-On, Project-Based Introduction to Programming",
+      "description": "A Hands-On, Project-Based Introduction to Programming. Python Crash Course is the world's best-selling guide to the Python programming language. This fast-paced, thorough introduction to programming with Python will have you writing programs, solving problems, and making things that work in no time.",
+      "category": "Programming",
+      "publisher": "No Starch Press",
+      "publishYear": 2019,
+      "language": "English",
+      "pages": 544,
+      "coverImage": "https://m.media-amazon.com/images/I/51Ky9uHd21L._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -80,7 +104,13 @@
       "title": "The Pragmatic Programmer",
       "author": "Andrew Hunt & David Thomas",
       "isbn": "9780201616224",
-      "description": "From Journeyman to Master",
+      "description": "From Journeyman to Master. Straight from the programming trenches, The Pragmatic Programmer cuts through the increasing specialization and technicalities of modern software development to examine the core process—taking a requirement and producing working, maintainable code that delights its users.",
+      "category": "Programming",
+      "publisher": "Addison-Wesley Professional",
+      "publishYear": 1999,
+      "language": "English",
+      "pages": 352,
+      "coverImage": "https://m.media-amazon.com/images/I/51W1sBPO7tL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -95,7 +125,13 @@
       "title": "Pride and Prejudice",
       "author": "Jane Austen",
       "isbn": "9780141439518",
-      "description": "A classic novel of manners",
+      "description": "Few have failed to be charmed by the witty and independent spirit of Elizabeth Bennet in Austen's beloved classic Pride and Prejudice. When Elizabeth Bennet first meets eligible bachelor Fitzwilliam Darcy, she thinks him arrogant and conceited; he is indifferent to her good looks and lively mind.",
+      "category": "Classic Literature",
+      "publisher": "Penguin Classics",
+      "publishYear": 1813,
+      "language": "English",
+      "pages": 480,
+      "coverImage": "https://m.media-amazon.com/images/I/41k+WVf6YEL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -120,7 +156,13 @@
       "title": "1984",
       "author": "George Orwell",
       "isbn": "9780451524935",
-      "description": "A dystopian novel set in a totalitarian society",
+      "description": "A dystopian novel set in a totalitarian society. Winston Smith toes the Party line, rewriting history to satisfy the demands of the Ministry of Truth. With each lie he writes, Winston grows to hate the Party that seeks power for its own sake and persecutes those who dare to commit thoughtcrimes.",
+      "category": "Dystopian Fiction",
+      "publisher": "Signet Classics",
+      "publishYear": 1949,
+      "language": "English",
+      "pages": 328,
+      "coverImage": "https://m.media-amazon.com/images/I/51-EUTyKnDL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -141,7 +183,13 @@
       "title": "The 7 Habits of Highly Effective People",
       "author": "Stephen R. Covey",
       "isbn": "9780743269513",
-      "description": "Powerful Lessons in Personal Change",
+      "description": "Powerful Lessons in Personal Change. One of the most inspiring and impactful books ever written, The 7 Habits of Highly Effective People has captivated readers for 25 years. It has transformed the lives of presidents and CEOs, educators and parents—in short, millions of people of all ages and occupations.",
+      "category": "Self-Help",
+      "publisher": "Simon & Schuster",
+      "publishYear": 1989,
+      "language": "English",
+      "pages": 432,
+      "coverImage": "https://m.media-amazon.com/images/I/51hV3Bo8ynL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -156,7 +204,13 @@
       "title": "A Brief History of Time",
       "author": "Stephen Hawking",
       "isbn": "9780553380163",
-      "description": "From the Big Bang to Black Holes",
+      "description": "From the Big Bang to Black Holes. A landmark volume in science writing by one of the great minds of our time, Stephen Hawking's book explores such profound questions as: How did the universe begin—and what made its start possible? Does time always flow forward? Is the universe unending—or are there boundaries?",
+      "category": "Science",
+      "publisher": "Bantam",
+      "publishYear": 1988,
+      "language": "English",
+      "pages": 212,
+      "coverImage": "https://m.media-amazon.com/images/I/51+GySc8ExL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -173,7 +227,13 @@
       "title": "The Hitchhiker's Guide to the Galaxy",
       "author": "Douglas Adams",
       "isbn": "9780345391803",
-      "description": "A comedy science fiction series",
+      "description": "A comedy science fiction series. Seconds before the Earth is demolished to make way for a galactic freeway, Arthur Dent is plucked off the planet by his friend Ford Prefect, a researcher for the revised edition of The Hitchhiker's Guide to the Galaxy who, for the last fifteen years, has been posing as an out-of-work actor.",
+      "category": "Science Fiction",
+      "publisher": "Del Rey",
+      "publishYear": 1979,
+      "language": "English",
+      "pages": 224,
+      "coverImage": "https://m.media-amazon.com/images/I/51MzUz8rQcL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -192,7 +252,13 @@
       "title": "The Innovator's Dilemma",
       "author": "Clayton M. Christensen",
       "isbn": "9780062060242",
-      "description": "The Revolutionary Book That Will Change the Way You Do Business",
+      "description": "The Revolutionary Book That Will Change the Way You Do Business. The bestselling classic on disruptive innovation, by renowned author Clayton M. Christensen. His work is cited by the world's best-known thought leaders, from Steve Jobs to Malcolm Gladwell.",
+      "category": "Business",
+      "publisher": "Harper Business",
+      "publishYear": 1997,
+      "language": "English",
+      "pages": 288,
+      "coverImage": "https://m.media-amazon.com/images/I/41zK7wPDUuL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -213,7 +279,13 @@
       "title": "Zero to One",
       "author": "Peter Thiel",
       "isbn": "9780804139298",
-      "description": "Notes on Startups, or How to Build the Future",
+      "description": "Notes on Startups, or How to Build the Future. The great secret of our time is that there are still uncharted frontiers to explore and new inventions to create. In Zero to One, legendary entrepreneur and investor Peter Thiel shows how we can find singular ways to create those new things.",
+      "category": "Business",
+      "publisher": "Currency",
+      "publishYear": 2014,
+      "language": "English",
+      "pages": 224,
+      "coverImage": "https://m.media-amazon.com/images/I/41puRJbtwkL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
@@ -236,7 +308,13 @@
       "title": "The Lean Startup",
       "author": "Eric Ries",
       "isbn": "9780307887894",
-      "description": "How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses",
+      "description": "How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses. Most startups fail. But many of those failures are preventable. The Lean Startup is a new approach being adopted across the globe, changing the way companies are built and new products are launched.",
+      "category": "Business",
+      "publisher": "Currency",
+      "publishYear": 2011,
+      "language": "English",
+      "pages": 336,
+      "coverImage": "https://m.media-amazon.com/images/I/51T-sMqSMiL._SL500_.jpg",
       "copies": [
         {
           "id": 1,
